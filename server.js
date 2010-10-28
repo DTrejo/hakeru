@@ -142,7 +142,7 @@ function handleHttp(req, res){
 }
 
 server = http.createServer(handleHttp);
-server.listen(9000);
+server.listen(9001);
 
 
 // Start socket.io
