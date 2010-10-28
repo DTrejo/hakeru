@@ -20,7 +20,7 @@ var clientPipeDictionary = new Object();
 function encodeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 }
-
+// boo
 		
 // Handles different modules
 var messageHandlers = new Object();
