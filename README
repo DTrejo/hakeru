@@ -1,1 +1,24 @@
-Initial Hakeru server committ
+      ___           ___           ___           ___           ___           ___     
+     /__/\         /  /\         /__/|         /  /\         /  /\         /__/\    
+     \  \:\       /  /::\       |  |:|        /  /:/_       /  /::\        \  \:\   
+      \__\:\     /  /:/\:\      |  |:|       /  /:/ /\     /  /:/\:\        \  \:\  
+  ___ /  /::\   /  /:/~/::\   __|  |:|      /  /:/ /:/_   /  /:/~/:/    ___  \  \:\ 
+ /__/\  /:/\:\ /__/:/ /:/\:\ /__/\_|:|____ /__/:/ /:/ /\ /__/:/ /:/___ /__/\  \__\:\
+ \  \:\/:/__\/ \  \:\/:/__\/ \  \:\/:::::/ \  \:\/:/ /:/ \  \:\/:::::/ \  \:\ /  /:/
+  \  \::/       \  \::/       \  \::/~~~~   \  \::/ /:/   \  \::/~~~~   \  \:\  /:/ 
+   \  \:\        \  \:\        \  \:\        \  \:\/:/     \  \:\        \  \:\/:/  
+    \  \:\        \  \:\        \  \:\        \  \::/       \  \:\        \  \::/   
+     \__\/         \__\/         \__\/         \__\/         \__\/         \__\/
+     
+     
+     Protips:
+        - Hakeru's production Node server is eric.no.de:9000
+        
+        - In order to push your changes to prod you must
+            1. Get your Joyent account added by Eric to eric.no.de
+            2. git remote add joyent ssh://node@eric.no.de/repo
+               git push joyent master
+            3. Server is now magically running
+            4. ssh node@eric.no.de and node-service-log to see errors
+        
+        - We don't have a dev server yet, so everything has to go to prod
