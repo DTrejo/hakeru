@@ -44,10 +44,12 @@
         - the server should now be running at http://localhost/room.html
         - all done! Develop to your heart's content.
         
-        Things that are broken:
+        Things that need attention:
         - sessions
         - upload
         - anything else that php used to do.
+        - clean up the existing code
+        - figure out how to do localhost/* path handling
         
           
          
