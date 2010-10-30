@@ -152,7 +152,9 @@ this.listen = function(server) {
     handleNewConnection(client);
   });
 };
-this.listen(http.createServer(handleHttp));
+server = http.createServer(handleHttp);
+server.listen(9000);
+this.listen(server);
 // this should be called again and overwritten when dserver.js calls listen.
 
 // Classes
