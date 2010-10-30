@@ -23,20 +23,24 @@
         
         - We don't have a dev server yet, so everything has to go to prod
       
-      How to get the dev server running (does not yet fully duplicate production, but in any case)
-        - clone this repository using like this:
+      How to get the dev server running! (does not yet fully duplicate production, but in any case)
+        - clone this repository using like this*:
           git clone --recursive git@github.com:3wt/Hakeru-Backend-Server.git
           
         - if you've already cloned, but forgot to do the above, run this:
           git submodule update --init
         
-        - make sure you have mongodb installed from http://www.mongodb.org/downloads, or just "sudo port install mongodb." 
-        Make sure you follow the quickstart guide for your OS (http://www.mongodb.org/display/DOCS/Quickstart). For mac you'd run:
+        - make sure you have mongodb installed from http://www.mongodb.org/downloads, 
+        or just "sudo port install mongodb." Make sure you follow the quickstart guide
+        for your OS (http://www.mongodb.org/display/DOCS/Quickstart). For mac you'd run:
+          mkdir -p /data/db
         
-        Also get the node code:
+        Also get the node code (how to install npm: http://github.com/isaacs/npm, 
+        how to install it along with node: http://gist.github.com/579814):
           npm install mongodb
+          npm install node-static@0.5.2
         
-        - now that you have all the submodules* (git repo dependencies) you should be able to start up the server:
+        - now that you have all the dependencies, you should be able to start up the server:
           cd Hakeru-Backend-Server
           mongod
           sudo node dserver.js
@@ -49,7 +53,7 @@
         - upload
         - anything else that php used to do.
         - clean up the existing code
-        - figure out how to do localhost/* path handling
+        - figure out how to do localhost/* path handling or subdomains.
         
         
 * to learn all about submodules, this is a good start http://longair.net/blog/2010/06/02/git-submodules-explained/
