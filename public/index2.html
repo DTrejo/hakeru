@@ -1,0 +1,111 @@
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>Hakeru - Chat it up</title>
+<meta charset="utf-8">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="/css/jquery.gritter.css">
+<link rel="stylesheet" type="text/css" href="/css/jScrollPane.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="/js/lib/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="/js/lib/jquery.em.js"></script>
+<script type="text/javascript" src="/js/lib/jScrollPane.js"></script>
+<script type="text/javascript" src="/js/lib/jquery.autolink.js"></script>
+<script type="text/javascript" src="/js/lib/jquery-css-transform.js"></script>
+<script type="text/javascript" src="/js/lib/jquery-animate-css-rotate-scale.js"></script>
+<script type="text/javascript" src="/js/lib/jquery.gritter.min.js"></script>
+
+<script type="text/javascript" src="/socket.io/socket.io.js"></script> 
+<script type="text/javascript" src="/js/session.js"></script>
+<script type="text/javascript">var id_session = 'testid'; var param = 'chatroomname'; var id_php = 'myuserid';</script>
+<!-- <script type="text/javascript" src="/js/<?=$page?>.js"></script> -->
+<!-- <script type="text/javascript">var id_session = '<?=$param[1]?>'; var param = '<?=$param[2]?>'; var id_php = '<?=$_SESSION[user]?>';</script> -->
+</head>
+<body>
+<div id="modal"><input type="file" multiple="true" id="filesUpload"></div>
+
+
+
+<div id="wrap">
+    <div id="statusbar"></div>
+    <div id="header"><img src="/images/logo.png" height="49" /></div>
+    <div id="menuwrap">
+    
+          <div class="topside"><div class="topleft corner"></div><div class="topright corner"></div></div>
+            <div class="main">
+                <div class="leftside"></div>
+                <div class="content">
+                    
+                    <div class="innercontent">
+                    	<h2 id="tasksheader">Open Tasks</h2>
+                        <div id="opentasks">
+                            <ul id="opentask-list">
+                                <li id="opentask-listbg" class="opentask">
+                                <div class="expand"><div class="left"></div><div id="opentaskcount" class="left"></div><div class="right arrow">&#9660;</div><div class="clear"></div></div><ul id="opentask-list-permenant"></ul></li>
+                            
+                            </ul>
+                        </div>
+                        <h2 id="usersheader">Users</h2>     
+                        <div id="users">
+                            <ul id="user-list">
+                            </ul>
+                        </div>
+                        
+                        <h2 id="filesheader">Shared Files</h2>     
+                        <div id="files-bg">
+                        	<div class="expand"><div class="left" id="sharedfilecount"></div><div class="right arrow">&#9660;</div><div class="clear"></div></div>
+                            <ul id="file-list">
+                            	
+                            </ul>
+                        </div>
+                    
+                    </div>
+                </div>
+                <div class="rightside"></div>
+            </div>
+            <div class="clear"></div>
+            <div class="bottomside"><div class="bottomleft corner"></div><div class="bottomright corner"></div>
+        </div>
+    
+    </div>
+    <div id="middle"></div>
+    <div id="chatwrap">
+    
+        <div class="topside"><div class="topleft corner"></div><div class="topright corner"></div></div>
+        <div class="main">
+            <div class="leftside"></div>
+            <div class="content">
+                <div class="innercontent">
+                 
+                 
+                 
+                        <div id="chat">
+                     	<div id="spinner" align="center"><img src="/images/spinner.gif" /></div>
+                        <div id="chat-messages"> 
+                        </div> 
+             
+                    
+                    </div> 
+                </div>
+                <div id="msgwrap">
+                    <div id="msgbg">                    <div id="dndnote"><strong>Drag and drop</strong> files here to share</div><textarea id="msg"></textarea></div>
+                </div>
+          
+            </div>
+            <div class="rightside"></div>
+        </div>
+        <div class="clear"></div>
+        <div class="bottomside"><div class="bottomleft corner"></div><div class="bottomright corner"></div>
+    </div>
+    
+</div>
+<ul id="output-listing01"></ul>
+
+
+
+</body>
+</html>

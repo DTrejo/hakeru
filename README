@@ -22,3 +22,23 @@
             4. ssh node@eric.no.de and node-service-log to see errors
         
         - We don't have a dev server yet, so everything has to go to prod
+      
+      How to get the dev server running (does not yet fully duplicate production, but in any case)
+        - clone this repository using like this:
+          git clone --recursive git@github.com:3wt/Hakeru-Backend-Server.git
+          
+        - if you've already cloned, but forgot to do the above, run this:
+          git submodule update --init
+        
+        - now that you have all the submodules* (the dependencies of the project), you should be able to start up the server:
+          cd Hakeru-Backend-Server
+          sudo node devserver.js
+        
+        - the server should now be running at http://localhost/
+        - all done! Develop to your heart's content.
+          
+         
+
+        
+        
+* to learn all about submodules, this is a good start http://longair.net/blog/2010/06/02/git-submodules-explained/
