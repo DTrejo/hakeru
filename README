@@ -31,15 +31,23 @@
           git submodule update --init
         
         - make sure you have mongodb installed from http://www.mongodb.org/downloads, or just "sudo port install mongodb." 
+        Make sure you follow the quickstart guide for your OS (http://www.mongodb.org/display/DOCS/Quickstart). For mac you'd run:
+        
         Also get the node code:
           npm install mongodb
         
         - now that you have all the submodules* (git repo dependencies) you should be able to start up the server:
           cd Hakeru-Backend-Server
-          sudo node devserver.js
+          mongod &
+          sudo node dserver.js
         
-        - the server should now be running at http://localhost/
+        - the server should now be running at http://localhost/room.html
         - all done! Develop to your heart's content.
+        
+        Things that are broken:
+        - sessions
+        - upload
+        - anything else that php used to do.
         
           
          
