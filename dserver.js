@@ -1,10 +1,10 @@
 var sys = require('sys')
   , url = require('url')
   , http = require('http')
-  , eyes = require('eyes')
+  // , eyes = require('eyes')
   , querystring = require('querystring')
-  , io = require(__dirname + '/lib/socket.io-node')
-  , journey = require('journey') // for json returning routes
+  // , io = require('./lib/socket.io-node')
+  // , journey = require('journey') // for json returning routes
   , PORT = 80 // MAKE SURE THIS IS SAME AS SOCKET.IO
 
   , static = require('node-static')
@@ -26,7 +26,7 @@ var httpServer = http.createServer(function (request, response) {
     for (var i in posted) {
       params[i] = posted[i]; // merging
     }
-    eyes.inspect(params);
+    // console.log(JSON.stringify(params));
 
     var path = url.parse(request.url).pathname;
     switch(path) {
@@ -40,6 +40,10 @@ var httpServer = http.createServer(function (request, response) {
         // there's no harm in caching a static page.
         fileServer.serveFile(path, 200, {}, request, response);
         break;
+  
+      case '/upload':
+        // move code from chat server into here.
+        // break;
  
       case '/':
         path = '/index.html';
@@ -75,7 +79,7 @@ var httpServer = http.createServer(function (request, response) {
             fileServer.serveFile('/404.html', err.headers, err.headers, request, response);
 
           } else { // The file was served successfully
-            console.log('> ' + request.url + ' - ' + res.message);
+            // console.log('> ' + request.url + ' - ' + res.message);
           }
         });
       break;
@@ -85,26 +89,29 @@ var httpServer = http.createServer(function (request, response) {
 
 
 httpServer.listen(PORT);
+var chatServer = require('./server.js');
+console.log(chatServer);
+chatServer.listen(httpServer);
 console.log('> server is listening on http://127.0.0.1:' + PORT);
 
 
 // All the socket.io magicx.
 // just the basic chat demo for now.
-var io = io.listen(httpServer),
-    buffer = [];
-
-io.on('connection', function(client){
-  client.send({ buffer: buffer });
-  client.broadcast({ announcement: client.sessionId + ' connected' });
-
-  client.on('message', function(message){
-    var msg = { message: [client.sessionId, message] };
-    buffer.push(msg);
-    if (buffer.length > 15) buffer.shift();
-    client.broadcast(msg);
-  });
-
-  client.on('disconnect', function(){
-    client.broadcast({ announcement: client.sessionId + ' disconnected' });
-  });
-});
+// var io = io.listen(httpServer),
+//     buffer = [];
+// 
+// io.on('connection', function(client){
+//   client.send({ buffer: buffer });
+//   client.broadcast({ announcement: client.sessionId + ' connected' });
+// 
+//   client.on('message', function(message){
+//     var msg = { message: [client.sessionId, message] };
+//     buffer.push(msg);
+//     if (buffer.length > 15) buffer.shift();
+//     client.broadcast(msg);
+//   });
+// 
+//   client.on('disconnect', function(){
+//     client.broadcast({ announcement: client.sessionId + ' disconnected' });
+//   });
+// });

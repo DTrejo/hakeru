@@ -30,13 +30,17 @@
         - if you've already cloned, but forgot to do the above, run this:
           git submodule update --init
         
+        - make sure you have mongodb installed from http://www.mongodb.org/downloads, or just "sudo port install mongodb." 
+        Also get the node code:
+          npm install mongodb
+        
         - now that you have all the submodules* (git repo dependencies) you should be able to start up the server:
-          
           cd Hakeru-Backend-Server
           sudo node devserver.js
         
         - the server should now be running at http://localhost/
         - all done! Develop to your heart's content.
+        
           
          
 

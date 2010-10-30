@@ -1,5 +1,5 @@
 var http = require('http'); 
-var io = require('socket.io');
+var io = require('./lib/socket.io-node');
 var sys = require('sys');    
 
 var Db = require('mongodb').Db;
@@ -123,7 +123,7 @@ function handleDisconnection(client) {
   
 }
 
-function handleHttp(req, res){
+function handleHttp (req, res){
   requestInfo= require('url').parse(req.url, true);
   if(requestInfo.pathname == "/upload" && 'query' in requestInfo && 'sessionId' in requestInfo.query && 'phpId' in requestInfo.query && 'url' in requestInfo.query && 'size' in requestInfo.query){
     console.log("RECEIVING UPLOAD");
@@ -141,16 +141,17 @@ function handleHttp(req, res){
 
 }
 
-server = http.createServer(handleHttp);
-server.listen(9000);
+this.listen = function(server) {
+  // server = http.createServer(handleHttp);
+  // TODO: fix uploads!
 
+  // Start socket.io
+  var sio = io.listen(server);
 
-// Start socket.io
-var io = io.listen(server);
-    
-io.on('connection', function(client){
-  handleNewConnection(client);
-});
+  sio.on('connection', function(client){
+    handleNewConnection(client);
+  });
+};
 
 // Classes
 

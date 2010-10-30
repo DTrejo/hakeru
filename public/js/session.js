@@ -329,10 +329,8 @@ function addToOpenTasks(the_task){
 
 $(document).ready(function() {
 	document.title =  "Hakeru - " + id_session;
-		
-  // io.setPath('js/'); Don't need this, since it gets served out at the default location now :)
-  // console.log(window.location);
-	socket = new io.Socket('eric.no.de', {port: 80, transports: ['websocket',
+	// MAKE SURE THIS IS THE SAME AS THE SERVER! BOTH null (the domain), and PORT.
+	socket = new io.Socket(null, {port: 80, transports: ['websocket',
 	'flashsocket', 'htmlfile', 'xhr-multipart', 'xhr-polling']});
 	socket.connect();
 	socket.addEvent('message', function(message){
