@@ -30,7 +30,8 @@
         - if you've already cloned, but forgot to do the above, run this:
           git submodule update --init
         
-        - now that you have all the submodules* (the dependencies of the project), you should be able to start up the server:
+        - now that you have all the submodules* (git repo dependencies) you should be able to start up the server:
+          
           cd Hakeru-Backend-Server
           sudo node devserver.js
         

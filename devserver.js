@@ -91,20 +91,20 @@ console.log('> server is listening on http://127.0.0.1:' + PORT);
 // All the socket.io magicx.
 // just the basic chat demo for now.
 var io = io.listen(httpServer),
-		buffer = [];
+    buffer = [];
 
 io.on('connection', function(client){
-	client.send({ buffer: buffer });
-	client.broadcast({ announcement: client.sessionId + ' connected' });
+  client.send({ buffer: buffer });
+  client.broadcast({ announcement: client.sessionId + ' connected' });
 
-	client.on('message', function(message){
-		var msg = { message: [client.sessionId, message] };
-		buffer.push(msg);
-		if (buffer.length > 15) buffer.shift();
-		client.broadcast(msg);
-	});
+  client.on('message', function(message){
+    var msg = { message: [client.sessionId, message] };
+    buffer.push(msg);
+    if (buffer.length > 15) buffer.shift();
+    client.broadcast(msg);
+  });
 
-	client.on('disconnect', function(){
-		client.broadcast({ announcement: client.sessionId + ' disconnected' });
-	});
+  client.on('disconnect', function(){
+    client.broadcast({ announcement: client.sessionId + ' disconnected' });
+  });
 });
