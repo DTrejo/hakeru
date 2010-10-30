@@ -1,10 +1,7 @@
 var sys = require('sys')
   , url = require('url')
   , http = require('http')
-  // , eyes = require('eyes')
   , querystring = require('querystring')
-  // , io = require('./lib/socket.io-node')
-  // , journey = require('journey') // for json returning routes
   , PORT = 80 // MAKE SURE THIS IS SAME AS SOCKET.IO
 
   , static = require('node-static')
@@ -60,7 +57,6 @@ var httpServer = http.createServer(function (request, response) {
         break;// all done!
       
       default:
-        // here we actually serve the static file
         // (any paramater parsing or special logic has been dealt with already)
         // We could also be a 404 if it does not exist.
         fileServer.serve(request, response, function (err, res) {
@@ -70,9 +66,7 @@ var httpServer = http.createServer(function (request, response) {
           // and then if you can't find a chat room, serve a 404 dude.
           // that might be the best way, since I'm not sure if you can do a redirect up above in the 'index.html' case.
           // The reason we'd use the switch statement method is if people are hitting files that need to parse params and all that.
-          // if node-static just served those files straight up, then we wouldn't get out hands on the information.
-          // On the other hands, all reqs go through this callback, so this probably wouldn't be a problem.
-          // Life's good, options eh?
+          // if node-static just served those files straight up, then we wouldn't get our hands on the information.
           
           if (err) { // An error as occured
             sys.error("> Error serving " + request.url + " - " + err.message);
@@ -87,13 +81,10 @@ var httpServer = http.createServer(function (request, response) {
   });
 });
 
-
 httpServer.listen(PORT);
 var chatServer = require('./server.js');
-console.log(chatServer);
 chatServer.listen(httpServer);
 console.log('> server is listening on http://127.0.0.1:' + PORT);
-
 
 // All the socket.io magicx.
 // just the basic chat demo for now.

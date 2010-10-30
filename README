@@ -38,10 +38,10 @@
         
         - now that you have all the submodules* (git repo dependencies) you should be able to start up the server:
           cd Hakeru-Backend-Server
-          mongod &
+          mongod
           sudo node dserver.js
         
-        - the server should now be running at http://localhost/room.html
+        - the server should now be running at http://localhost/index.html
         - all done! Develop to your heart's content.
         
         Things that need attention:
@@ -50,10 +50,6 @@
         - anything else that php used to do.
         - clean up the existing code
         - figure out how to do localhost/* path handling
-        
-          
-         
-
         
         
 * to learn all about submodules, this is a good start http://longair.net/blog/2010/06/02/git-submodules-explained/

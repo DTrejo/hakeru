@@ -1,73 +1,107 @@
-<html>
+<!DOCTYPE HTML>
+<html lang="en">
 <head>
-  <title>testin</title>
-  <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
-  <script src="/socket.io/socket.io.js" type="text/javascript"></script> 
-  <!-- <script>
-  $(document).ready(function () {
-    var socket = new io.Socket(window.location.host);
-    socket.on('connect', function(){ socket.send('hi!'); console.log(arguments); }) 
-    socket.on('message', function(){ console.log(arguments); }) 
-    socket.on('disconnect', function(){ console.log(arguments); }) 
-    console.log('do');
-  });
-  </script> -->
-  <style>
-    #chat { height: 300px; overflow: auto; width: 800px; border: 1px solid #eee; font: 13px Helvetica, Arial; }
-    #chat p { padding: 8px; margin: 0; }
-    #chat p:nth-child(odd) { background: #F6F6F6; }
-    #form { width: 782px; background: #333; padding: 5px 10px; display: none; }
-    #form input[type=text] { width: 700px; padding: 5px; background: #fff; border: 1px solid #fff; }
-    #form input[type=submit] { cursor: pointer; background: #999; border: none; padding: 6px 8px; -moz-border-radius: 8px; -webkit-border-radius: 8px; margin-left: 5px; text-shadow: 0 1px 0 #fff; }
-    #form input[type=submit]:hover { background: #A2A2A2; }
-    #form input[type=submit]:active { position: relative; top: 2px; }
-  </style>
-</head>
+<title>Hakeru - Dev</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="en-us">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="stylesheet" type="text/css" href="css/style.css">
+<link rel="stylesheet" type="text/css" href="css/jquery.gritter.css">
+<link rel="stylesheet" type="text/css" href="css/jScrollPane.css">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/lib/jquery.mousewheel.js"></script>
+<script type="text/javascript" src="js/lib/jquery.em.js"></script>
+<script type="text/javascript" src="js/lib/jScrollPane.js"></script>
+<script type="text/javascript" src="js/lib/jquery.autolink.js"></script>
+<script type="text/javascript" src="js/lib/jquery-css-transform.js"></script>
+<script type="text/javascript" src="js/lib/jquery-animate-css-rotate-scale.js"></script>
+<script type="text/javascript" src="js/lib/jquery.gritter.min.js"></script>
 
+<script type="text/javascript" src="socket.io/socket.io.js"></script>
+<script type="text/javascript" src="js/session.js"></script>
+<script type="text/javascript">var id_session = '1337'; var param = '1338'; var id_php = '1339';</script>
+</head>
 <body>
-  <h1>Hi there.</h1>
-  <form method="post">
-  Name: <input type="text" name="name"/>
-  <input type="submit" value="Join" name="op" />
-  </form>
-  
-  <script>
-    function message(obj){
-      var el = document.createElement('p');
-      if ('announcement' in obj) el.innerHTML = '<em>' + esc(obj.announcement) + '</em>';
-      else if ('message' in obj) el.innerHTML = '<b>' + esc(obj.message[0]) + ':</b> ' + esc(obj.message[1]);
-      document.getElementById('chat').appendChild(el);
-      document.getElementById('chat').scrollTop = 1000000;
-    }
-    
-    function send(){
-      var val = document.getElementById('text').value;
-      socket.send(val);
-      message({ message: ['you', val] });
-      document.getElementById('text').value = '';
-    }
-    
-    function esc(msg){
-      return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    };
-    
-    var socket = new io.Socket(null, {port: 80}); // MAKE SURE THIS IS SAME AS PORT OF SERVER.
-    socket.connect();
-    socket.on('message', function(obj){
-      if ('buffer' in obj){
-        document.getElementById('form').style.display='block';
-        document.getElementById('chat').innerHTML = '';
+<div id="modal"><input type="file" multiple="true" id="filesUpload"></div>
+
+<div id="wrap">
+    <div id="statusbar"></div>
+    <div id="header"><img src="/images/logo.png" height="49" /></div>
+
+    <div id="menuwrap">    
+        <div class="topside"><div class="topleft corner"></div><div class="topright corner"></div></div>
         
-        for (var i in obj.buffer) message(obj.buffer[i]);
-      } else message(obj);
-    });
-  </script>
-  
-  <h1>Sample chat client</h1>
-  <div id="chat"><p>Connecting...</p></div>
-  <form id="form" onsubmit="send(); return false">
-    <input type="text" autocomplete="off" id="text"><input type="submit" value="Send">
-  </form>
+        <div class="main">
+            <div class="leftside"></div>
+            
+            <div class="content">       
+                <div class="innercontent">
+                  
+                  <h2 id="tasksheader">Open Tasks</h2>
+                  <div id="opentasks">
+                      <ul id="opentask-list">
+                          <li id="opentask-listbg" class="opentask">
+                          <div class="expand">
+                            <div class="left"></div>
+                            <div id="opentaskcount" class="left"></div>
+                            <div class="right arrow">&#9660;</div>
+                            <div class="clear"></div>
+                          </div>
+                          <ul id="opentask-list-permenant"></ul>
+                          </li>
+                      </ul>
+                  </div>
+                  <h2 id="usersheader">Users</h2>     
+                  <div id="users">
+                      <ul id="user-list">
+                      </ul>
+                  </div>  
+                  <h2 id="filesheader">Shared Files</h2>     
+                  <div id="files-bg">
+                    <div class="expand">
+                      <div class="left" id="sharedfilecount"></div>
+                      <div class="right arrow">&#9660;</div><div class="clear"></div></div>
+                      <ul id="file-list"></ul>
+                  </div>                
+                </div>
+            </div>
+            
+            <div class="rightside"></div>
+            
+        </div>
+        <div class="clear"></div>
+        <div class="bottomside"><div class="bottomleft corner"></div><div class="bottomright corner"></div>
+      </div>
+    </div>
+    
+    <div id="middle"></div>
+    <div id="chatwrap">
+    
+        <div class="topside"><div class="topleft corner"></div><div class="topright corner"></div></div>
+        <div class="main">
+            <div class="leftside"></div>
+            <div class="content">
+                <div class="innercontent">
+                    <div id="chat">
+                      <div id="spinner" align="center"><img src="/images/spinner.gif"></div>
+                      <div id="chat-messages"></div> 
+                      </div> 
+                    </div>
+                <div id="msgwrap">
+                    <div id="msgbg">
+                      <div id="dndnote"><strong>Drag and drop</strong> files here to share</div><textarea id="msg"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="rightside"></div>
+        </div>
+        <div class="clear"></div>
+        <div class="bottomside"><div class="bottomleft corner"></div><div class="bottomright corner"></div>
+    </div>
+
+</div>
+<ul id="output-listing01"></ul>
 
 </body>
 </html>
+
