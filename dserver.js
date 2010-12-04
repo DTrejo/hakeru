@@ -2,107 +2,121 @@ var sys = require('sys')
   , url = require('url')
   , http = require('http')
   , querystring = require('querystring')
-  , PORT = 80 // MAKE SURE THIS IS SAME AS SOCKET.IO
-
-  , static = require('node-static')
-  
-  // Create a node-static server to serve the current directory
-  , fileServer = new static.Server('./public', { cache: 7200, headers: {'X-Hello':'Hakeru Rocks!'} });
+  , jqserve = require('jqserve')
+  , session = require('sesh').session
+  , PORT = 80; // MAKE SURE THIS IS SAME AS SOCKET.IO
 
 // Firin up our in-built node server
 var httpServer = http.createServer(function (request, response) {
+  session(request, response, function(request, response){
+    // now we can access request.session
 
-  request.body = '';
-  request.addListener('data', function(chunk){ request.body += chunk; });
-
-  // now that we have the whole request body, let's do stuff with it.
-  request.addListener('end', function () {
+    request.body = '';
+    request.addListener('data', function(chunk){ request.body += chunk; });
     
-    var params = querystring.parse(url.parse(request.url).query);
+    // console.log(request.url);
+    var parsed = url.parse(request.url);
+    var params = querystring.parse(parsed.query);
     var posted = querystring.parse(request.body);
-    for (var i in posted) {
-      params[i] = posted[i]; // merging
-    }
-    // console.log(JSON.stringify(params));
+    for (var i in posted) { params[i] = posted[i]; }  // merging
 
-    var path = url.parse(request.url).pathname;
-    switch(path) {
-      
-      // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
-      case '/login.html':
-        // process params or whatnot.
+    // now that we have the whole request body, let's do stuff with it.
+    request.addListener('end', function () {
+      // console.log(JSON.stringify(params));
 
-        // but will client cache it when we don't want them to? This is not an issue,
-        // because the client should talk to URLs that return JSON in order to get data, and so 
-        // there's no harm in caching a static page.
-        fileServer.serveFile(path, 200, {}, request, response);
-        break;
-  
-      case '/upload':
-        // move code from chat server into here.
-        // break;
- 
-      case '/':
-        path = '/index.html';
-      case '/index.html':
-        // some logic here to handle chat room redirects if logged-in.
-        // ..code..
-        
-        // when we need them to go into a particular chat room, they first go to the
-        // appropriate URL, then we detect they are going to a chatroom,
-        // then we serve them a chat room page and let them cache it. 
-        // Then once they've been served the page, they ask for the latest chat data from
-        // one of our urls that returns JSON, not yet shown in this example.
-        fileServer.serveFile(path, 200, {}, request, response);
-        break;// all done!
-      
-      default:
-        // (any paramater parsing or special logic has been dealt with already)
-        // We could also be a 404 if it does not exist.
-        fileServer.serve(request, response, function (err, res) {
-          
-          // might be better to totally ditch the switch statement and friggin
-          // attempt to serve all static files, and then if not found attempt to serve up a chat room
-          // and then if you can't find a chat room, serve a 404 dude.
-          // that might be the best way, since I'm not sure if you can do a redirect up above in the 'index.html' case.
-          // The reason we'd use the switch statement method is if people are hitting files that need to parse params and all that.
-          // if node-static just served those files straight up, then we wouldn't get our hands on the information.
-          
-          if (err) { // An error as occured
-            sys.error("> Error serving " + request.url + " - " + err.message);
-            fileServer.serveFile('/404.html', err.headers, err.headers, request, response);
+      switch(parsed.pathname) {
+        case '/':
+        case '/index.html':
+          jqserve(request, response, 'index.html');
+          break;
 
-          } else { // The file was served successfully
-            // console.log('> ' + request.url + ' - ' + res.message);
+        // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
+        case '/login.json':
+          params.userid; // check this against db
+          params.password; // check this against md5 version in DB.
+          params.pipeName;
+          // console.log(request.session.data);
+          if (params.userid == 'johnny' && params.password == 'j') {
+            request.session.data.user = params.userid;
+            sendJson(response, { msg: 'success' });
+          } else {
+            sendJson(response, { msg: 'Bad combination - Try again?' });
           }
-        });
-      break;
-    }
+          break;
+          
+        case '/logout':
+          request.session.data.user = 'Guest';
+          redirect(response, request, '/index.html', 302);
+          break;
+        
+        case '/notify':
+        case '/notify.html':
+          jqserve(request, response, '/notify.html', function(err, $) {
+            var link = $('#link');
+            link.attr('href', 'http://'+request.headers.host+ '/' + params.pipe + '/#' + params.hash);
+            $('#title').text(params.title);
+            $('#msg').text(params.msg);
+          });
+          break;
+          
+        // case '/upload':
+        //   // move code from chat server into here.
+        //   break;
+
+        default:
+          // need to serve chatrooms here if url is of form /*
+          var hashstripped = parsed.pathname.substring(0, parsed.pathname.lastIndexOf('/#'));
+          if (/^(\/)((?:[a-z][a-z0-9_]*))$/i.test(parsed.pathname)) {
+            // console.log('user:',request.session.data.user);
+            // console.log('history:',request.session.data.history);
+            if (request.session.data.user === 'Guest') {
+              redirect(response, request, '/login.html', 302);
+              return;
+              
+            } else { // they are logged in, so give them a room
+              jqserve(request, response, '/room.html', function(err, $) {
+                if (err) console.log(err);
+                var userid = $('<link/>').attr('id', 'userid')
+                                         .attr('userid', request.session.data.user);
+                $('head').append(userid);
+              });
+              return;
+            }
+          }
+          
+          // else, serve static
+          jqserve(request, response);
+        break;
+      }
+    });
+
   });
 });
+
+function sendJson(response, json) {
+  console.dir(json);
+  var text = JSON.stringify(json);
+  response.writeHead(200, {'Content-Type':'application/json', 'Content-Length':text.length});
+  console.log(text);
+  response.end(text); // problem with sending this?
+}
+
+function redirect(res, req, location, status) {
+  location = req.headers.host + location + '?' + req.url;
+  var html = ['<html><head>'
+             // , '<meta http-equiv="Refresh" content="0; url=http://'+location+'" />'
+             , '</head><body>'
+             , '<p>Please go to <a href="http://'+location+'">'+location+'</a>!</p>'
+             , '</body></html>'
+             ].join('\n');
+  res.writeHead(status, { 'Content-Type': 'text/html'
+                        , 'Content-Length': html.length
+                        , 'Location': 'http://' + location
+                        });
+  res.end(html);
+}
 
 httpServer.listen(PORT);
 var chatServer = require('./server.js');
 chatServer.listen(httpServer);
-console.log('> server is listening on http://127.0.0.1:' + PORT);
-
-// All the socket.io magicx.
-// just the basic chat demo for now.
-// var io = io.listen(httpServer),
-//     buffer = [];
-// 
-// io.on('connection', function(client){
-//   client.send({ buffer: buffer });
-//   client.broadcast({ announcement: client.sessionId + ' connected' });
-// 
-//   client.on('message', function(message){
-//     var msg = { message: [client.sessionId, message] };
-//     buffer.push(msg);
-//     if (buffer.length > 15) buffer.shift();
-//     client.broadcast(msg);
-//   });
-// 
-//   client.on('disconnect', function(){
-//     client.broadcast({ announcement: client.sessionId + ' disconnected' });
-//   });
-// });
+console.log('> server is listening on http://127.0.0.1:' + PORT + '/');

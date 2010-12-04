@@ -1,7 +1,11 @@
+var pipeName = window.location.pathname.replace('/', ''); // room name
+id_session = pipeName;
+var userid = $('#userid').attr('userid'); // username (taken from a link element inserted into head by server)
+id_php = userid;
+console.log('pipeName',id_session);
+console.log('userid', userid);
+
 var id_client;
-
-var id_php;
-
 var latestChat;
 
 var hasFocus = true;
@@ -521,7 +525,7 @@ function showHTMLNotification(title, msg, hash) {
 			window.webkitNotifications.requestPermission(function(){});
 		} else if (!hasFocus){
 		
-			var popup = window.webkitNotifications.createHTMLNotification('/notify.php?pipe='+ id_session +'&title=' + title + '&msg=' + msg + '&hash=' + hash);
+			var popup = window.webkitNotifications.createHTMLNotification('/notify?pipe='+ id_session +'&title=' + title + '&msg=' + msg + '&hash=' + hash);
 			
 			setTimeout(function(){popup.cancel();}, 3000);
 			popup.show();

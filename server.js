@@ -1,5 +1,5 @@
 var http = require('http'); 
-var io = require('./lib/socket.io-node');
+var io = require('socket.io');
 var sys = require('sys');    
 
 var Db = require('mongodb').Db;
