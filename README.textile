@@ -54,21 +54,27 @@ all done! Develop to your heart's content.
   
 h2. Things that need attention:
 
-* √sessions — you must use username <code>johnny</code> with password <code>j</code> in order to test it, as it's not hooked up to the DB.
+* √ sessions — you must use username <code>johnny</code> with password <code>j</code> in order to test it, as it's not hooked up to the DB.
+* √ localhost/* url routing works
+* √ chat rooms work
+* √ html5 notifications work
+* registration
 * upload
-* anything else that php used to do.
-* clean up the existing code
-* √figure out how to do localhost/* path handling or subdomains.
+* clean up the existing code, especially in the chatserver. indentation, variable naming, classes in different files.
+* make url routing more robust. Use a routing module?
+* server dies if mongod not running — add a try-catch and display something helpful, like could not connect to DB. This way already-running rooms will stay up even if server dies.
 
 *to learn all about submodules, this is a good start http://longair.net/blog/2010/06/02/git-submodules-explained/
 
 h2. troubleshooting
 
-* I'm missing a module!
+I'm missing a module!
 * Do a ctrl-f <code>npm</code> and make sure you've installed everything in this guide
 
-* there are empty folders that should not be empty!
+There are empty folders that should not be empty!
 * do a <code>git submodule update --init</code>
 
-* I have an error!
+I have an error!
 * email david or call him, make sure to have the stack trace on hand
+
+

@@ -13,15 +13,12 @@ var httpServer = http.createServer(function (request, response) {
 
     request.body = '';
     request.addListener('data', function(chunk){ request.body += chunk; });
-    
-    // console.log(request.url);
-    var parsed = url.parse(request.url);
-    var params = querystring.parse(parsed.query);
-    var posted = querystring.parse(request.body);
-    for (var i in posted) { params[i] = posted[i]; }  // merging
-
-    // now that we have the whole request body, let's do stuff with it.
-    request.addListener('end', function () {
+    request.addListener('end', function () { // now we have the whole request body, let's do stuff with it.
+      
+      var parsed = url.parse(request.url);
+      var params = querystring.parse(parsed.query);
+      var posted = querystring.parse(request.body);
+      for (var i in posted) { params[i] = posted[i]; }  // merging
       // console.log(JSON.stringify(params));
 
       switch(parsed.pathname) {
@@ -41,7 +38,7 @@ var httpServer = http.createServer(function (request, response) {
             sendJson(response, { msg: 'success' });
           } else {
             sendJson(response, { msg: 'Bad combination - Try again?' });
-          }
+          }          
           break;
           
         case '/logout':
@@ -52,8 +49,8 @@ var httpServer = http.createServer(function (request, response) {
         case '/notify':
         case '/notify.html':
           jqserve(request, response, '/notify.html', function(err, $) {
-            var link = $('#link');
-            link.attr('href', 'http://'+request.headers.host+ '/' + params.pipe + '/#' + params.hash);
+            if (err) console.log(err);
+            $('#link').attr('href', 'http://' + request.headers.host + '/' + params.pipe + '/#' + params.hash);
             $('#title').text(params.title);
             $('#msg').text(params.msg);
           });
@@ -65,7 +62,7 @@ var httpServer = http.createServer(function (request, response) {
 
         default:
           // need to serve chatrooms here if url is of form /*
-          var hashstripped = parsed.pathname.substring(0, parsed.pathname.lastIndexOf('/#'));
+          var hashstripped = parsed.pathname.substring(0, parsed.pathname.lastIndexOf('/#')); // not very robust
           if (/^(\/)((?:[a-z][a-z0-9_]*))$/i.test(parsed.pathname)) {
             // console.log('user:',request.session.data.user);
             // console.log('history:',request.session.data.history);
@@ -117,6 +114,6 @@ function redirect(res, req, location, status) {
 }
 
 httpServer.listen(PORT);
-var chatServer = require('./server.js');
+var chatServer = require('./server.js'); // start up the chat server too.
 chatServer.listen(httpServer);
 console.log('> server is listening on http://127.0.0.1:' + PORT + '/');
