@@ -1,0 +1,13 @@
+{
+  "name": "jqserve",
+  "description": "Utility that allows you to run arbitrary server-side jquery code against an html file before serving it.",
+  "version": "0.0.5",
+  "author": "David Trejo <dtrejo@cs.brown.edu> (dtrejo.com)",
+  "main": "jqserve",
+  "directories": {
+    "lib": ""
+  },
+  "engines": {
+    "node": "*"
+  }
+}
