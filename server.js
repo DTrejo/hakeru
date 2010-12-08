@@ -41,6 +41,7 @@ var httpServer = http.createServer(function (request, response) {
 
         // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
         case '/login.json':
+          console.log("loggin in");
           mongo.collection('users', function(err, collection){
             collection.findOne({'username': params.userid, 'password': md5(params.password)}, function(err, doc) {
               if('username' in doc) {
