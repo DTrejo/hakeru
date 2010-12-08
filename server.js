@@ -1,7 +1,7 @@
 var sys = require('sys')
   , url = require('url')
   , http = require('http')
-  , crypto = require('crypto');
+  , crypto = require('crypto')
   , querystring = require('querystring')
   , jqserve = require('jqserve')
   , session = require('sesh').session
