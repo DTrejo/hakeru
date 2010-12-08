@@ -208,7 +208,7 @@ function Pipe (name) {
                   files.push(docs[fileIndex]);
                 }
                 self.send('zip' , {session_id: client.sessionId, zipped: self.zip()});
-                mongo.close();
+                
               });
             });
           });
@@ -243,7 +243,7 @@ function Pipe (name) {
   this.newFile = function(fileObj){
     console.log("Inserting le file" + JSON.stringify(fileObj));
     mongo.collection('files', function(err, collection){
-      collection.insert(fileObj, function(err, docs){mongo.close();});
+      collection.insert(fileObj, function(err, docs){});
     });
   }
 
@@ -254,7 +254,7 @@ function Pipe (name) {
     console.log(theTask);
  
     mongo.collection('tasks', function(err, collection){
-      collection.insert(theTask, function(err, docs){mongo.close();});
+      collection.insert(theTask, function(err, docs){});
     });
 
     nextTaskId++;
@@ -266,7 +266,7 @@ function Pipe (name) {
     theTask.owner = userId;
     mongo.collection('tasks', function(err, collection){
       console.log(taskId);
-      collection.update({id: Number(taskId), pipe: name}, {"$set" : {owner: userId}}, function(err, docs){mongo.close();});
+      collection.update({id: Number(taskId), pipe: name}, {"$set" : {owner: userId}}, function(err, docs){});
     });
     return tasks[taskId];
   }
@@ -275,7 +275,7 @@ function Pipe (name) {
     var theTask = tasks[taskId];
     theTask.completed = true;
     mongo.collection('tasks', function(err, collection){
-      collection.update({id: Number(taskId), pipe: name}, {"$set" : {completed: true}}, function(err, docs){mongo.close();});
+      collection.update({id: Number(taskId), pipe: name}, {"$set" : {completed: true}}, function(err, docs){});
     });
     return tasks[taskId];
   }
@@ -284,7 +284,7 @@ function Pipe (name) {
     var theTask = tasks[taskId];
     theTask.owner = 0;
     mongo.collection('tasks', function(err, collection){
-      collection.update({id: Number(taskId), pipe: name}, {"$set" : {owner: 0}}, function(err, docs){mongo.close();});
+      collection.update({id: Number(taskId), pipe: name}, {"$set" : {owner: 0}}, function(err, docs){});
     });
     return theTask;
   }
@@ -293,7 +293,7 @@ function Pipe (name) {
     var theTask = tasks[taskId];
     mongo.collection('tasks', function(err,collection){
       collection.remove({id: Number(taskId), pipe: name}, function(err,docs){
-        mongo.close();
+        
       });
     });
     delete tasks[taskId];
