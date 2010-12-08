@@ -16,6 +16,15 @@ $(document).ready(function() {
     return false;
   });
   
+  $("#register").click(function(e){
+    $("#notice").slideUp(function(){
+      $.getJSON("/register.json", { userid: $("#handle").val(), password: $("#password").val() }, function(json){
+        $("#notice").text(json.msg).slideDown();
+      });
+    });
+    return false;
+  });
+  
   $("#handle, #password").keypress(function(e){
     if(e.keyCode == 13) {
       $("#submit").click();

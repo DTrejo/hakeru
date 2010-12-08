@@ -1,11 +1,20 @@
 var sys = require('sys')
   , url = require('url')
   , http = require('http')
+  , crypto = require('crypto');
   , querystring = require('querystring')
   , jqserve = require('jqserve')
   , session = require('sesh').session
   , PORT = 80; // MAKE SURE THIS IS SAME AS SOCKET.IO
 
+var Db = require('mongodb').Db;
+var Connection = require('mongodb').Connection;
+var Server = require('mongodb').Server;
+var BSON = require('mongodb').BSONPure;
+
+var mongo = new Db('hakeru', new Server("localhost", 27017, {}));
+
+  
 // Firin up our in-built node server
 var httpServer = http.createServer(function (request, response) {
   session(request, response, function(request, response){
@@ -32,18 +41,32 @@ var httpServer = http.createServer(function (request, response) {
 
         // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
         case '/login.json':
-          params.userid; // check this against db
-          params.password; // check this against md5 version in DB.
-          params.pipeName;
-          // console.log(request.session.data);
-          if (params.userid == 'johnny' && params.password == 'j') {
-            request.session.data.user = params.userid;
-            sendJson(response, { msg: 'success' });
-          } else {
-            sendJson(response, { msg: 'Bad combination - Try again?' });
-          }
+          mongo.collection('users', function(err, collection){
+            collection.findOne({'username': params.userid, 'password': md5(params.password)}, function(err, doc) {
+              if('username' in doc) {
+                request.session.data.user = params.userid;
+                sendJson(response, { msg: 'success' });
+              } else {
+                sendJson(response, { msg: 'Bad combination - Try again?' });
+              }
+            });
+            params.userid; // check this against db
+            params.password; // check this against md5 version in DB.
+            params.pipeName; // useful in future for making sure has access to pipe
+          });
           break;
-          
+        case '/register.json':
+            mongo.collection('users', function(err, collection){
+              collection.findOne({'username': params.userid}, function(err, doc) {
+                if('username' in doc) {
+                  sendJson(response, { msg: 'Username is taken, try another' });
+                } else {
+                  collection.insert({username: params.userid, password: md5(params.password)},function(err, docs){});
+                  sendJson(response, { msg: 'Registered!' });
+                }
+              });
+            });
+          break;
         case '/logout':
           request.session.data.user = 'Guest';
           redirect(response, request, '/index.html', 302);
@@ -101,6 +124,9 @@ function sendJson(response, json) {
   response.end(text); // problem with sending this?
 }
 
+function md5(data) {
+  return crypto.createHash('md5').update(data).digest("hex");
+}
 function redirect(res, req, location, status) {
   location = req.headers.host + location + '?' + req.url;
   var html = ['<html><head>'
@@ -117,6 +143,8 @@ function redirect(res, req, location, status) {
 }
 
 httpServer.listen(PORT);
+// Start server connection
+mongo.open(function(p_client){});
 var chatServer = require('./hakeru.js');
 chatServer.listen(httpServer);
 console.log('> server is listening on http://127.0.0.1:' + PORT + '/');
