@@ -59,7 +59,7 @@ var httpServer = http.createServer(function (request, response) {
         case '/register.json':
             mongo.collection('users', function(err, collection){
               collection.findOne({'username': params.userid}, function(err, doc) {
-                if('username' in doc) {
+                if(doc != undefined) {
                   sendJson(response, { msg: 'Username is taken, try another' });
                 } else {
                   collection.insert({username: params.userid, password: md5(params.password)},function(err, docs){});
