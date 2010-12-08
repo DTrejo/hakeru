@@ -1,11 +1,7 @@
-var pipeName = window.location.pathname.replace('/', ''); // room name
-id_session = pipeName;
-var userid = $('#userid').attr('userid'); // username (taken from a link element inserted into head by server)
-id_php = userid;
-console.log('pipeName',id_session);
-console.log('userid', userid);
+var pipeName = window.location.pathname.replace('/', '')
 
-var id_client;
+var me = new Object();
+
 var latestChat;
 
 var hasFocus = true;
@@ -15,10 +11,11 @@ window.onfocus = gotFocus;
 
 function gotFocus() {
 
-		document.title =  "Hakeru - " + id_session;
+		document.title =  "Hakeru - " + pipeName;
 		hasFocus = true;
 
 }
+
 
 // stop shit from breaking if it's not there.
 if(!window.console) {
@@ -32,22 +29,22 @@ if(!window.console) {
 var messageHandlers = new Object();
 // Handle chat
 messageHandlers['chat'] = function(data){
-	if(latestChat != null && "attr" in latestChat && latestChat.attr('client_id') == data.client_id){
+	if(latestChat != null && "attr" in latestChat && latestChat.attr('user_id') == data.user_id){
 		latestChat.append("<br>" + data.msg);
 	} else {
-		if(data.client_id == id_php){
+		if(data.user_id == me.userId){
 			var bgClass = "chatbg-me";
 		} else {
 			var bgClass = "chatbg";
 		}
-		latestChat = $("<div></div>").attr("client_id", data.client_id).html(data.msg).addClass(bgClass);
-		$("#chat-messages").append("<strong>" + data.client_id + "</strong>" +"<br>").append(latestChat);
+		latestChat = $("<div></div>").attr("user_id", data.user_id).html(data.msg).addClass(bgClass);
+		$("#chat-messages").append("<strong>" + data.user_id + "</strong>" +"<br>").append(latestChat);
 	}
 	
 	latestChat.mailto();
 	latestChat.autolink();
 	if(!hasFocus){
-		document.title = data.client_id + " says " + data.msg.substring(0,100);
+		document.title = data.user_id + " says " + data.msg.substring(0,100);
 	}
 	scrollPaneToBottom($("#chatwrap .innercontent"), false, true);
 }
@@ -56,7 +53,7 @@ messageHandlers['new_task'] = function(data){
 	latestChat = null;
 	var newLink = $("<a></a>").attr("href", "#").addClass("accept_task").attr("task_id", data.the_task.id).text("I'm on it");	
 	var newTask = $("<div></div>").attr("id", "newtask"+data.the_task.id).addClass("newtaskbg").append(data.the_task.text + " ").append(newLink);
-	$("#chat-messages").append("<strong>" + data.client_id + " posted a new task</strong>").append(newTask);
+	$("#chat-messages").append("<strong>" + data.user_id + " posted a new task</strong>").append(newTask);
 	//console.log(data);
 	newLink.click(acceptButtonClick);
 	addToOpenTasks(data.the_task);
@@ -72,10 +69,10 @@ messageHandlers['accept_success'] = function(data){
 	$('a[class="delete_task"][task_id="'+data.the_task.id+'"]').remove();
 
 	var notice = $("#givenuptask"+data.the_task.id + ", #newtask"+data.the_task.id);
-	notice.append('<strong>Claimed by ' + data.client_id + '</strong>');
+	notice.append('<strong>Claimed by ' + data.user_id + '</strong>');
 	notice.attr("id", notice.attr("id") + "_old");
 	var notice2 = $("#opentask" + data.the_task.id + " .right");
-	notice2.append('<strong>Claimed by ' + data.client_id + '</strong>');
+	notice2.append('<strong>Claimed by ' + data.user_id + '</strong>');
 	notice2.parent().attr("id", notice2.parent().attr("id") + "_old");
 	
 	drawMenuWindow();
@@ -87,51 +84,51 @@ messageHandlers['accept_success'] = function(data){
 		});
 	}, 3000);
 	
-	bindTaskButtons(data.client_id, data.the_task);
-	showHTMLNotification("Task Accepted" ,data.client_id + " accepted task " + data.the_task.text,"");
+	bindTaskButtons(data.user_id, data.the_task);
+	showHTMLNotification("Task Accepted" ,data.user_id + " accepted task " + data.the_task.text,"");
 }
 messageHandlers['gone'] = function(data){
-	$("li[client_id="+data.client_id+"]").removeClass("useractive");
+	$("li[user_id="+data.user_id+"]").removeClass("useractive");
 }
 messageHandlers['user_joined'] = function(data){
-	if($("li[client_id="+data.client_id+"]").length == 0){
-		var userItem = $("<li></li>").addClass("user").addClass("useractive").attr('client_id', data.client_id).append('<div client_id="'+data.client_id+'" class="expand"><div class="left">'+data.client_id+'</div><div class="right arrow">&#9660;</div><div class="clear"></div></div><ul class="task-list clear"> </ul>');
+	if($("li[user_id="+data.user_id+"]").length == 0){
+		var userItem = $("<li></li>").addClass("user").addClass("useractive").attr('user_id', data.user_id).append('<div user_id="'+data.user_id+'" class="expand"><div class="left">'+data.user_id+'</div><div class="right arrow">&#9660;</div><div class="clear"></div></div><ul class="task-list clear"> </ul>');
 		$('#user-list').append(userItem);
 	
 		bindExpandCollapseButton(userItem);	
 	
 	} else {
-		$("li[client_id="+data.client_id+"]").addClass("useractive");
+		$("li[user_id="+data.user_id+"]").addClass("useractive");
 	}
-	showHTMLNotification("New User" ,data.client_id + " joined " + id_session,"");
+	showHTMLNotification("New User" ,data.user_id + " joined " + pipeName,"");
 }
 
 messageHandlers['zip'] = function(data){
 	
-	id_client = data.sessionId;
+	me.sessionId = data.session_id;
 	$("#spinner").remove();
 	$('#user-list').empty();
 	$('#opentask-list-permenant').empty();
 	$('#chat-messages').empty();
 	
-	for(var client_id in data.zipped.users){
-		if(client_id != 0){
-			var userItem = $("<li></li>").addClass("user").attr('client_id', client_id).append('<div client_id="'+client_id+'" class="expand"><div class="left">'+client_id+'</div><div class="right arrow">&#9660;</div><div class="clear"></div></div><ul class="task-list"> </ul>');
-			if('here' in data.zipped.users[client_id] && data.zipped.users[client_id].here == true){
+	for(var user_id in data.zipped.users){
+		if(user_id != 0){
+			var userItem = $("<li></li>").addClass("user").attr('user_id', user_id).append('<div user_id="'+user_id+'" class="expand"><div class="left">'+user_id+'</div><div class="right arrow">&#9660;</div><div class="clear"></div></div><ul class="task-list"> </ul>');
+			if('here' in data.zipped.users[user_id] && data.zipped.users[user_id].here == true){
 				userItem.addClass("useractive");
 			}
 			$('#user-list').append(userItem);
 			bindExpandCollapseButton(userItem);
-			for(var task_id in data.zipped.users[client_id]){
+			for(var task_id in data.zipped.users[user_id]){
 				if(task_id != 'here'){
-					var the_task = data.zipped.users[client_id][task_id];
-					bindTaskButtons(client_id, the_task);
+					var the_task = data.zipped.users[user_id][task_id];
+					bindTaskButtons(user_id, the_task);
 				}
 			}
 		} else {
-			for(var task_id in data.zipped.users[client_id]){
+			for(var task_id in data.zipped.users[user_id]){
 				if(task_id != 'here'){
-					var the_task = data.zipped.users[client_id][task_id];
+					var the_task = data.zipped.users[user_id][task_id];
 					addToOpenTasks(the_task);
 				}
 			}
@@ -168,7 +165,7 @@ messageHandlers['file_upload'] = function(data){
 	
 	addToSharedFilesList(data);
 	
-	if(data.client_id == id_php){
+	if(data.user_id == me.userId){
 		var bgClass = "chatbg-me";
 	} else {
 		var bgClass = "chatbg";
@@ -176,11 +173,11 @@ messageHandlers['file_upload'] = function(data){
 	
 	var fileLink = $("<a></a>").attr('target', '_blank').attr('href', data.file_url).text(filename);
 	
-	latestChat = $("<div></div>").attr("client_id", data.client_id).addClass(bgClass).append(fileLink).append(" " + size_format(data.size));
-	$("#chat-messages").append("<strong>" + data.client_id + " shared a file</strong>" +"<br>").append(latestChat);
+	latestChat = $("<div></div>").attr("user_id", data.user_id).addClass(bgClass).append(fileLink).append(" " + size_format(data.size));
+	$("#chat-messages").append("<strong>" + data.user_id + " shared a file</strong>" +"<br>").append(latestChat);
 
 	if(!hasFocus){
-		document.title = data.client_id + " shared " + filename.substring(0,100);
+		document.title = data.user_id + " shared " + filename.substring(0,100);
 	}
 	latestChat = null;
 	
@@ -190,9 +187,9 @@ messageHandlers['file_upload'] = function(data){
 messageHandlers['task_completed'] = function (data){
 	latestChat = null;
 	var completedTask = $("<div></div>").addClass("completetaskbg").append(data.the_task.text);
-	$("#chat-messages").append("<strong>"+data.client_id+" has completed a task</strong>").append(completedTask);
+	$("#chat-messages").append("<strong>"+data.user_id+" has completed a task</strong>").append(completedTask);
 	$('li[task_id="'+data.the_task.id+'"]').remove();
-	showHTMLNotification("Task Completed" ,data.client_id + " completed task " + data.the_task.text,"");
+	showHTMLNotification("Task Completed" ,data.user_id + " completed task " + data.the_task.text,"");
 	scrollPaneToBottom($("#chatwrap .innercontent"), false, true);
 }
 
@@ -214,11 +211,11 @@ messageHandlers['given_up'] = function (data){
 	latestChat = null;
 	var newLink = $("<a></a>").attr("href", "#").addClass("accept_task").attr("task_id", data.the_task.id).text("I'm on it");
 	var newTask = $("<div></div>").attr("id","givenuptask"+data.the_task.id).html(data.the_task.text + " ").addClass("giveuptaskbg").append(newLink)
-	$("#chat-messages").append("<strong>"+data.client_id+" has given up on a task</strong>").append(newTask);
+	$("#chat-messages").append("<strong>"+data.user_id+" has given up on a task</strong>").append(newTask);
 	$('li[task_id="'+data.the_task.id+'"]').remove();
 	newLink.click(acceptButtonClick);
 	
-	showHTMLNotification("Task Given Up" ,data.client_id + " gave up on " + data.the_task.text,"");
+	showHTMLNotification("Task Given Up" ,data.user_id + " gave up on " + data.the_task.text,"");
 	addToOpenTasks(data.the_task);
 	updateOpenTaskCount();
 	drawMenuWindow();
@@ -266,18 +263,18 @@ function markCompletedClick(e){
 	socket.send(JSON.stringify({type:"complete_task", data:{task_id: $(this).attr("task_id")}}));
 }
 
-function bindTaskButtons(client_id, the_task){
-	if(client_id == id_php){
+function bindTaskButtons(user_id, the_task){
+	if(user_id == me.userId){
 		var markCompletedLink = $("<a></a>").attr("href", "#").attr("task_id", the_task.id).addClass("mark_completed").text("Mark as complete");
 		var giveUpLink = $("<a></a>").attr("href", "#").attr("task_id", the_task.id).addClass("give_up").text("Give up");
 		var rightDiv = $("<div></div>").addClass("right").append(markCompletedLink).append(" ").append(giveUpLink);
 		var taskItem = $("<li></li>").addClass("task").attr("task_id", the_task.id).append('<div class="left">'+the_task.text+'</div>').append(rightDiv).append('<div class="clear"></div>');;
-		$('li[client_id="'+id_php+'"] .task-list').append(taskItem);
+		$('li[user_id="'+me.userId+'"] .task-list').append(taskItem);
 		giveUpLink.click(giveUpClick);
 		markCompletedLink.click(markCompletedClick);
 
 	} else {
-		$('li[client_id="'+client_id+'"] .task-list').append('<li class="task" task_id="'+the_task.id+'">'+the_task.text+'</li>');
+		$('li[user_id="'+user_id+'"] .task-list').append('<li class="task" task_id="'+the_task.id+'">'+the_task.text+'</li>');
 	}
 
 }
@@ -332,16 +329,19 @@ function addToOpenTasks(the_task){
 }
 
 $(document).ready(function() {
-	document.title =  "Hakeru - " + id_session;
-	// MAKE SURE THIS IS THE SAME AS THE SERVER! BOTH null (the domain), and PORT.
-	socket = new io.Socket(null, {port: 80, transports: ['websocket',
+	
+	me.userId = $('#userid').attr('userid');
+	
+	document.title =  "Hakeru - " + pipeName;
+		
+	socket = new io.Socket('eric.no.de', {port: 9000, transports: ['websocket',
 	'flashsocket', 'htmlfile', 'xhr-multipart', 'xhr-polling']});
 	socket.connect();
 	socket.addEvent('message', function(message){
 		//console.log(message);
 		try {
 			var messageObj = JSON.parse(message);
-			//console.log(messageObj);
+			console.log(messageObj);
 			if("type" in messageObj && messageObj.type in messageHandlers) {
 		    	messageHandlers[messageObj.type](messageObj.data);
 			}
@@ -351,7 +351,7 @@ $(document).ready(function() {
 	});
 	
 	socket.addEvent('connect', function(message){		
-		socket.send(JSON.stringify({type: "sessionCheckIn", data: {pipe: id_session, phpId: id_php}}));
+		socket.send(JSON.stringify({type: "sessionCheckIn", data: {pipe: pipeName, user_id: me.userId}}));
 	});
 	
 	
@@ -644,8 +644,8 @@ function closePopup() {
 				xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 				xhr.setRequestHeader("X-File-Name", file.fileName);
 				xhr.setRequestHeader("X-File-Size", file.fileSize);
-				xhr.setRequestHeader("X-Client-Id", id_client);
-				xhr.setRequestHeader("X-Php-Id", id_php);
+				xhr.setRequestHeader("X-Client-Id", me.sessionId);
+				xhr.setRequestHeader("X-Php-Id", me.userId);
 				
 				xhr.setRequestHeader("Content-Type", "multipart/form-data");
 				xhr.send(file);
