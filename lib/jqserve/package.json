@@ -7,6 +7,10 @@
   "directories": {
     "lib": ""
   },
+  "dependencies": { "jquery":"",
+                    "jsdom":"",
+                    "node-static":""
+                  },
   "engines": {
     "node": "*"
   }

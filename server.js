@@ -3,7 +3,7 @@ var sys = require('sys')
   , http = require('http')
   , crypto = require('crypto')
   , querystring = require('querystring')
-  , jqserve = require('jqserve')
+  , jqserve = require('./lib/jqserve/jqserve.js')
   , session = require('sesh').session
   , PORT = 80; // MAKE SURE THIS IS SAME AS SOCKET.IO
 
@@ -94,7 +94,7 @@ var httpServer = http.createServer(function (request, response) {
             // console.log('user:',request.session.data.user);
             // console.log('history:',request.session.data.history);
             if (request.session.data.user === 'Guest') {
-              redirect(response, request, '/login.html', 302);
+              redirectToRoom(response, request, '/login.html', 302);
               return;
               
             } else { // they are logged in, so give them a room
@@ -129,7 +129,7 @@ function md5(data) {
   return crypto.createHash('md5').update(data).digest("hex");
 }
 function redirect(res, req, location, status) {
-  location = req.headers.host + location + '?' + req.url;
+  location = req.headers.host + location;
   var html = ['<html><head>'
              // , '<meta http-equiv="Refresh" content="0; url=http://'+location+'" />'
              , '</head><body>'
@@ -141,6 +141,9 @@ function redirect(res, req, location, status) {
                         , 'Location': 'http://' + location
                         });
   res.end(html);
+}
+function redirectToRoom(res, req, location, status) {
+  redirect(res, req, location + '?' + req.url, status);
 }
 
 httpServer.listen(PORT);
