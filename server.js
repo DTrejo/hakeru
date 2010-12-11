@@ -27,8 +27,8 @@ var httpServer = http.createServer(function (request, response) {
     // now that we have the whole request body, let's do stuff with it.
     request.addListener('end', function () {
       // merge url params and posted params. This could be dangerous in the future.
-      var parsed = url.parse(request.url);
-        , params = querystring.parse(parsed.query);
+      var parsed = url.parse(request.url)
+        , params = querystring.parse(parsed.query)
         , posted = querystring.parse(request.body);
       for (i in posted) { params[i] = posted[i]; }
 

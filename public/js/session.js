@@ -637,7 +637,7 @@ function closePopup() {
           });
         }, false);
 
-        xhr.open("POST", "upload.php");
+        xhr.open("POST", "/upload");
         
         xhr.setRequestHeader("If-Modified-Since", "Mon, 26 Jul 1997 05:00:00 GMT");
         xhr.setRequestHeader("Cache-Control", "no-cache");
