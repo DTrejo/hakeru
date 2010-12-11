@@ -631,7 +631,7 @@ function closePopup() {
         fileUpload.addEventListener("error", function(evt) {
           $.gritter.add({
             // (string | mandatory) the heading of the notification
-            title: 'Failed uploading ' + files[i].fileName,
+            title: 'Failed uploading ' + file.fileName,
             // (string | mandatory) the text inside the notification
             text: 'Unknown error'
           });
