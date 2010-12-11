@@ -5,14 +5,15 @@ var sys = require('sys')
   , querystring = require('querystring')
   , jqserve = require('./lib/jqserve/jqserve.js')
   , session = require('sesh').session
-  , PORT = 80; // MAKE SURE THIS IS SAME AS SOCKET.IO
+  , PORT = 80 // MAKE SURE THIS IS SAME AS SOCKET.IO
 
-var Db = require('mongodb').Db;
-var Connection = require('mongodb').Connection;
-var Server = require('mongodb').Server;
-var BSON = require('mongodb').BSONPure;
-
-var mongo = new Db('hakeru', new Server("localhost", 27017, {}));
+  , Db = require('mongodb').Db
+  , Connection = require('mongodb').Connection
+  , Server = require('mongodb').Server
+  , BSON = require('mongodb').BSONPure
+  , mongo = new Db('hakeru', new Server("localhost", 27017, {}))
+  
+  , formidable = require('formidable');
 
   
 // Firin up our in-built node server
@@ -23,15 +24,13 @@ var httpServer = http.createServer(function (request, response) {
     request.body = '';
     request.addListener('data', function(chunk){ request.body += chunk; });
     
-    // console.log(request.url);
-    var parsed = url.parse(request.url);
-    var params = querystring.parse(parsed.query);
-    var posted = querystring.parse(request.body);
-    for (var i in posted) { params[i] = posted[i]; }  // merging
-
     // now that we have the whole request body, let's do stuff with it.
     request.addListener('end', function () {
-      // console.log(JSON.stringify(params));
+      // merge url params and posted params. This could be dangerous in the future.
+      var parsed = url.parse(request.url);
+        , params = querystring.parse(parsed.query);
+        , posted = querystring.parse(request.body);
+      for (i in posted) { params[i] = posted[i]; }
 
       switch(parsed.pathname) {
         case '/':
@@ -44,7 +43,7 @@ var httpServer = http.createServer(function (request, response) {
           console.log("loggin in");
           mongo.collection('users', function(err, collection){
             collection.findOne({'username': params.userid, 'password': md5(params.password)}, function(err, doc) {
-              if(doc != undefined) {
+              if (doc != undefined) {
                 request.session.data.user = params.userid;
                 sendJson(response, { msg: 'success' });
               } else {
@@ -59,7 +58,7 @@ var httpServer = http.createServer(function (request, response) {
         case '/register.json':
             mongo.collection('users', function(err, collection){
               collection.findOne({'username': params.userid}, function(err, doc) {
-                if(doc != undefined) {
+                if (doc != undefined) {
                   sendJson(response, { msg: 'Username is taken, try another' });
                 } else {
                   collection.insert({username: params.userid, password: md5(params.password)},function(err, docs){});
@@ -83,9 +82,25 @@ var httpServer = http.createServer(function (request, response) {
           });
           break;
           
-        // case '/upload':
-        //   // move code from chat server into here.
-        //   break;
+        case '/upload':
+          if (request.method.toLowerCase() == 'post') {
+            handleUpload(request, response);
+          } else {
+            jqserve(request,response,'404.html');
+          }
+          break;
+        
+        // for easy testing.
+        case '/demo':
+          request.session.data.user = 'demouser';
+          jqserve(request, response, '/room.html', function(err, $) {
+            if (err) console.log(err);
+            var userid = $('<link/>').attr('id', 'userid')
+                                     .attr('userid', request.session.data.user);
+            $('head').append(userid);
+          });
+          break;
+          
 
         default:
           // need to serve chatrooms here if url is of form /*
@@ -117,14 +132,24 @@ var httpServer = http.createServer(function (request, response) {
   });
 });
 
+function handleUpload (req, res) {
+  // parse a file upload
+  var form = new formidable.IncomingForm();
+  form.parse(req, function(err, fields, files) {
+    if (err) console.log(err);
+    sendJson({fields: fields, files: files});
+  });
+}
+
 function sendJson(response, json) {
   console.dir(json);
   var text = JSON.stringify(json);
   response.writeHead(200, {'Content-Type':'application/json', 'Content-Length':text.length});
-  console.log(text);
   response.end(text); // problem with sending this?
 }
 
+// should we add a salt?
+// are we missing any cryto stuff?
 function md5(data) {
   return crypto.createHash('md5').update(data).digest("hex");
 }
