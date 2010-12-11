@@ -3,7 +3,7 @@ $(document).ready(function() {
   
   $("#submit").click(function(e){
     $("#notice").slideUp(function(){
-      $.getJSON("/login.json", { userid: $("#handle").val(), password: $("#password").val() }, function(json){
+      $.getJSON("/login.json", { userid: $("#handle").val().toLowerCase(), password: $("#password").val() }, function(json){
         console.log(json);
         if (json.msg == 'success') {
           // need to refresh the page so it will load the room they want.
@@ -11,6 +11,15 @@ $(document).ready(function() {
         } else {
           $("#notice").text(json.msg).slideDown();
         }
+      });
+    });
+    return false;
+  });
+  
+  $("#register").click(function(e){
+    $("#notice").slideUp(function(){
+      $.getJSON("/register.json", { userid: $("#handle").val().toLowerCase(), password: $("#password").val() }, function(json){
+        $("#notice").text(json.msg).slideDown();
       });
     });
     return false;
