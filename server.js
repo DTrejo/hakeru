@@ -92,7 +92,7 @@ var httpServer = http.createServer(function (request, response) {
         
         // for easy testing.
         case '/demo':
-          request.session.data.user = 'demouser';
+          if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
           jqserve(request, response, '/room.html', function(err, $) {
             if (err) console.log(err);
             var userid = $('<link/>').attr('id', 'userid')
