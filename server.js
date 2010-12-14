@@ -172,6 +172,7 @@ function redirectToRoom(res, req, location, status) {
 }
 
 httpServer.listen(PORT);
+
 // Start server connection
 mongo.open(function(p_client){});
 var chatServer = require('./hakeru.js');
