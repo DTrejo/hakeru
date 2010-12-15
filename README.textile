@@ -21,7 +21,7 @@ In order to push your changes to prod you must
 
 # Get your Joyent account added by Eric to eric.no.de, then
   <pre> git remote add joyent ssh://node@eric.no.de/repo
- git push joyent master</pre>
+git push joyent master</pre>
 # Server is now magically running
 # ssh node@eric.no.de and node-service-log to see errors
 
@@ -39,30 +39,29 @@ make sure you have "mongodb installed":http://www.mongodb.org/downloads, or just
 <pre>mkdir -p /data/db</pre>
   
 Also get the node code ("install npm":http://github.com/isaacs/npm, or "install it along with node":http://gist.github.com/579814):
-<pre>npm install lib/*
-npm install mongodb
-npm install node-static@0.5.2</pre>
+<pre>npm install mongodb node-static@0.5.2 socket.io mongodb sesh formidable</pre>
   
-h2. now that you have all the dependencies, you should be able to start up the server:
+h2. Now that you have all the dependencies, you should be able to start up the server:
 
 <pre>cd Hakeru-Backend-Server
 mongod
-sudo node dserver.js</pre>
+sudo node server.js</pre>
 
 the server should now be running at "http://localhost/":http://localhost/
 all done! Develop to your heart's content.
   
 h2. Things that need attention:
-
-* √ sessions — you must use username <code>johnny</code> with password <code>j</code> in order to test it, as it's not hooked up to the DB.
-* √ localhost/* url routing works
-* √ chat rooms work
-* √ html5 notifications work
 * registration
 * upload
 * clean up the existing code, especially in the chatserver. indentation, variable naming, classes in different files.
 * make url routing more robust. Use a routing module?
 * server dies if mongod not running — add a try-catch and display something helpful, like could not connect to DB. This way already-running rooms will stay up even if server dies.
+* √ demo room: "eric.no.de/demo":http://eric.no.de/demo
+* √ sessions
+* √ eric.no.de/* url routing works
+* √ chat rooms work
+* √ html5 notifications work
+
 
 *to learn all about submodules, this is a good start http://longair.net/blog/2010/06/02/git-submodules-explained/
 
@@ -76,5 +75,3 @@ There are empty folders that should not be empty!
 
 I have an error!
 * email david or call him, make sure to have the stack trace on hand
-
-
