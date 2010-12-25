@@ -97,7 +97,14 @@ function handleNewConnection(client){
   console.log('Message Received');   
     var messageObj = JSON.parse(message);
     if(messageObj != null && "type" in messageObj && messageObj.type in messageHandlers) {
-        messageHandlers[messageObj.type](client, messageObj.data);
+      messageHandlers[messageObj.type](client, messageObj.data);
+
+      console.log('Saving Message');
+      mongo.collection('messages', function(err, collection){
+        messageObj.date = new Date(); // is this any good?
+        collection.insert(messageObj, function(err, docs){});
+      });
+      
     }
   });
   
@@ -144,14 +151,8 @@ console.log("HTTP GOT");
 
 
 
-
-
 this.listen = function(server) {
-  // server = http.createServer(handleHttp);
-  // TODO: fix uploads!
-
   // Start socket.io
-  
   mongo.open(function(p_client){});
 
   var sio = io.listen(server);
@@ -160,10 +161,7 @@ this.listen = function(server) {
     handleNewConnection(client);
   });
 };
-//server = http.createServer(handleHttp);
-//server.listen(9000);
 
-//this.listen(server);
 
 // Classes
 

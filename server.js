@@ -42,7 +42,7 @@ var httpServer = http.createServer(function (request, response) {
         case '/login.json':
           console.log("loggin in");
           mongo.collection('users', function(err, collection){
-            collection.findOne({'username': params.userid, 'password': md5(params.password)}, function(err, doc) {
+            collection.findOne({'username': params.userid, 'password': encrypt(params.password)}, function(err, doc) {
               if (doc != undefined) {
                 request.session.data.user = params.userid;
                 sendJson(response, { msg: 'success' });
@@ -61,7 +61,7 @@ var httpServer = http.createServer(function (request, response) {
                 if (doc != undefined) {
                   sendJson(response, { msg: 'Username is taken, try another' });
                 } else {
-                  collection.insert({username: params.userid, password: md5(params.password)},function(err, docs){});
+                  collection.insert({username: params.userid, password: encrypt(params.password)},function(err, docs){});
                   sendJson(response, { msg: 'Registered!' });
                 }
               });
@@ -148,9 +148,12 @@ function sendJson(response, json) {
   response.end(text); // problem with sending this?
 }
 
-// should we add a salt?
-// are we missing any cryto stuff?
-function md5(data) {
+// 
+// THIS SHOULD REALLY USE BCRYPT  
+// https://github.com/ncb000gt/node.bcrypt.js
+// Too bad bcrypt doesn't work on Solaris?
+// 
+function encrypt(data) {
   return crypto.createHash('md5').update(data).digest("hex");
 }
 function redirect(res, req, location, status) {
