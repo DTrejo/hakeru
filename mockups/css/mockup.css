@@ -1,0 +1,43 @@
+body {
+  background: #B0B4BD url("../images/background.png");
+  overflow-x: hidden;
+  overflow-y: scroll;
+  font-size: 125%;
+  font-family: Apex, "Helvetica Neue", "HelveticaNeue", "Lucida Grande", Helvetica, Arial, sans-serif;
+  color: #222;
+}
+#highlight {
+/*  top:200px;*/
+  width: 1158px;
+  min-height: 897px;
+  background: url("../images/bg_center_highlight.png") no-repeat;
+  margin: 0 auto;
+  margin-bottom: -897px;
+}
+
+#wrap {
+  position: relative;
+  margin: 3em auto;
+  width: 600px;
+}
+
+.col4 {
+  width: 100%;
+  overflow: auto;
+}
+.col4 > div {
+  width: 24%;
+  float: left;
+}
+.col4 > p:last-child {
+  margin-left: 75%;
+  float: left;
+  color: #555;
+  font-size: .7em;
+}
+
+.right{float: right;}
+.left{float: left;}
+.hide{display:none;}
+.small{font-size: .7em;}
+.quiet {color: #555;}

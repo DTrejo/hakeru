@@ -1,4 +1,4 @@
-var pipeName = window.location.pathname.replace('/', '')
+var pipeName = window.location.pathname.replace('/', '');
 
 var me = new Object();
 
@@ -28,25 +28,35 @@ if(!window.console) {
 // Handles different modules
 var messageHandlers = new Object();
 // Handle chat
-messageHandlers['chat'] = function(data){
-  if(latestChat != null && "attr" in latestChat && latestChat.attr('user_id') == data.user_id){
-    latestChat.append("<br>" + data.msg);
+// there are three cases: 
+//    message from someone else
+//    first message written by oneself
+//    message directly following a message by oneself
+messageHandlers['chat'] = function(data) {
+  var linkedMsg = $('<span>').html(data.msg).mailto().autolink();
+  $('a', linkedMsg).embedly({maxWidth:600,'method':'after'});
+  // will the above work?
+  
+  // message directly following a message by oneself
+  if (latestChat != null && 'attr' in latestChat && latestChat.attr('user_id') == data.user_id) {
+    latestChat.append(linkedMsg);
   } else {
-    if(data.user_id == me.userId){
-      var bgClass = "chatbg-me";
-    } else {
-      var bgClass = "chatbg";
+    if (data.user_id == me.userId) { // first message written by oneself
+      var bgClass = 'chatbg-me';
+      
+    } else { // message from someone else
+      var bgClass = 'chatbg';
     }
-    latestChat = $("<div></div>").attr("user_id", data.user_id).html(data.msg).addClass(bgClass);
-    $("#chat-messages").append("<strong>" + data.user_id + "</strong>" +"<br>").append(latestChat);
+    latestChat = $('<div></div>').attr('user_id', data.user_id)
+                                 .append(linkedMsg)
+                                 .addClass(bgClass);
+    $('#chat-messages').append('<strong>' + data.user_id + '</strong>' +'<br>').append(latestChat);
   }
   
-  latestChat.mailto();
-  latestChat.autolink();
-  if(!hasFocus){
-    document.title = data.user_id + " says " + data.msg.substring(0,100);
+  if (!hasFocus) {
+    document.title = data.user_id + ' says ' + data.msg.substring(0,100);
   }
-  scrollPaneToBottom($("#chatwrap .innercontent"), false, true);
+  scrollPaneToBottom($('#chatwrap .innercontent'), false, true);
 }
 
 messageHandlers['new_task'] = function(data){
@@ -334,7 +344,8 @@ $(document).ready(function() {
   
   document.title =  "Hakeru - " + pipeName;
     
-  socket = new io.Socket('eric.no.de', {port: 80, transports: ['websocket',
+  // null defaults to domain this file was served-from
+  socket = new io.Socket(null, {port: 80, transports: ['websocket', 
   'flashsocket', 'htmlfile', 'xhr-multipart', 'xhr-polling']});
   socket.connect();
   socket.addEvent('message', function(message){

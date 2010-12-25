@@ -1,0 +1,39 @@
+/* This file is part of Centage!. */
+/* Copyright (C) 2010 Jussi Jokinen <jussijokinen@iki.fi>. */
+/* Licenced under MIT licence */
+
+body{
+	font-family: 'Helvetica Neue', Arial, sans-serif;}
+	
+h1,h2,h3,h4 {
+	font-weight: bold;}
+	
+h1 {
+	@font:5em;
+	font-size: @font;
+	line-height: @line/@font*4;
+	margin-bottom: @line/@font;}
+
+h2 {
+	@font:3em;
+	font-size: @font;
+	line-height: @line/@font*2;
+	margin-bottom: (@line/@font);
+	margin-top: (@line/@font*2);}
+	
+h3 {
+	@font:1.5em;
+	font-size:@font;
+	line-height: @line/@font;
+	margin-bottom: @line/@font;
+	margin-top:@line/@font;}
+
+p {
+	@font:1em;
+	margin-bottom: @line/@font;}
+
+strong {
+	font-weight: bold;}
+
+em {
+	font-style: italic;}

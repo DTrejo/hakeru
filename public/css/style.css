@@ -126,9 +126,11 @@ div {outline: 0; border: 0;}
 	padding: 3px 5px 3px 5px;
 	background-color: #fff;
 }
-
 .chatbg-me {
 	background-color: #f0edea;
+}
+.chatbg > span, .chatbg-me > span {
+  display: block;
 }
 
 .newtaskbg, .completetaskbg, .giveuptaskbg {

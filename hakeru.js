@@ -7,7 +7,7 @@ var Connection = require('mongodb').Connection;
 var Server = require('mongodb').Server;
 var BSON = require('mongodb').BSONPure;
 
-var mongo = new Db('hakeru', new Server("localhost", 27017, {}));
+var mongo = new Db('hakeru', new Server('localhost', 27017, {}));
 
 
 

@@ -1,0 +1,290 @@
+/* This file is part of Centage!. */
+/* Copyright (C) 2010 Jussi Jokinen <jussijokinen@iki.fi>. */
+/* Licenced under MIT licence */
+
+
+/* THE FOLLOWING ARE CALCULATED VARIABLES FOR YOUR PLEASURE */
+/* -------------------------------------------------------- */
+/* gutterless column width */
+@col1:100% / @grid;
+
+/* column width when gutters are used */
+@col1_gut:(100% - @gut * (@grid - 1)) / @grid;
+
+/* column + gutter */
+@col1_plus_gut:@col1_gut + @gut;
+
+/* the true leading = line height - font size */
+@leading:@line - @fontpxem; 
+
+/* body font size in percentages */
+@bodyfont:100% * (@fontpx/16);
+
+/* line height in ems */ 
+@line:@linepx/@fontpx * 1em; 
+
+@fontpxem:@fontpx * 1em; /*this is needed for calculations*/
+@linepxem:@linepx * 1em; /*this is needed for calculations*/
+
+/* -------------------------------------------------------------------- */
+
+/* @group reset */
+/* You can use your preferred reset instead, this one is  
+  html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
+  v1.4 2009-07-27 | Authors: Eric Meyer & Richard Clark
+  html5doctor.com/html-5-reset-stylesheet/
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  font-size:100%;
+  vertical-align:baseline;
+  background:transparent;
+}                  
+
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section { 
+    display:block;
+}
+
+nav ul { list-style:none; }
+
+blockquote, q { quotes:none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after { content:''; content:none; }
+
+a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
+
+ins { background-color:#ff9; color:#000; text-decoration:none; }
+
+mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
+
+del { text-decoration: line-through; }
+
+abbr[title], dfn[title] { border-bottom:1px dotted; cursor:help; }
+
+/* tables still need cellspacing="0" in the markup */
+table { border-collapse:collapse; border-spacing:0; }
+
+hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
+
+input, select { vertical-align:middle; }
+
+/* @end */
+
+/* @group body styles */
+
+body {
+	font-family: @font;
+	font-size: @bodyfont;
+	line-height: @line;}
+
+/* @end */
+
+/* @group core styles */
+
+/* content area standard properties, IF you need content to overflow visibly, use .clearfix after .col/.sub_col to override default*/
+.mod{
+	float:left;
+	overflow:hidden;}
+	
+/*top level column */	
+.col(@col_count:1, @pad_top:0, @pad_right:0, @pad_bottom:0, @pad_left:0) {
+	width:((@col1_gut * @col_count) + (@gut * (@col_count - 1)) - @pad_left - @pad_right);
+	*width:(@col1_gut * @col_count) + (@gut * (@col_count - 1)) - 0.2% - @pad_left - @pad_right;/* for IE */
+	.mod; 
+	margin-right:@gut;
+	padding-top:@pad_top;
+	padding-right:@pad_right;
+	padding-bottom:@pad_bottom;
+	padding-left:@pad_left;	
+	}
+
+/*nested column inside parent container element */
+.sub-col(@parent_cols:1, @sub_cols:1, @pad_top:0, @pad_right:0, @pad_bottom:0, @pad_left:0){
+	width:((100 / (@parent_cols * @col1_gut + (@parent_cols * @gut - @gut))) * (@sub_cols * @col1_gut + (@sub_cols * @gut - @gut)) - @pad_left - @pad_right);/* for IE */	
+	*width:((100 / (@parent_cols * @col1_gut + (@parent_cols * @gut - @gut))) * (@sub_cols * @col1_gut + (@sub_cols * @gut - @gut))) - 1% - @pad_left - @pad_right;
+	.mod;
+	margin-right:(100 / (@parent_cols * @col1_gut + (@parent_cols * @gut - @gut))) * @gut;
+	padding-top:@pad_top;
+	padding-right:@pad_right;
+	padding-bottom:@pad_bottom;
+	padding-left:@pad_left;	
+	}
+
+
+/* column based on full width of page */
+.col-full(@col_count:1, @padd_v:0, @padd_h:0) {
+	width:((@col1 * @col_count) - (@padd_h * 2%));
+	*width:(@col1 * @col_count) - 0.2% - (@padd_h * 2%);/* for IE */
+	.mod; 
+	padding-top:@padd_v;
+	padding-bottom:@padd_v;
+	padding-left:@padd_h;
+	padding-right:@padd_h;}
+
+/* columns without gutters = check demo page to understand difference with .col-full */
+.col-nogut(@col_count:1, @padd_v:0, @padd_h:0) {
+	@col-halfgut-width:((@col1_gut * @col_count) + (@gut * (@col_count)) - (@padd_h * 2%));
+	width: @col-halfgut-width;
+	*width:	@col-halfgut-width - 0.2%;/* for IE */
+	.mod; 
+	padding-top:@padd_v;
+	padding-bottom:@padd_v;
+	padding-left:@padd_h;
+	padding-right:@padd_h;}
+
+/* columns without gutters, first and last of row */
+.col-nogut-first-last(@col_count:1, @padd_v:0, @padd_h:0) {
+	@col-halfgut-width:((@col1_gut * @col_count) + (@gut * (@col_count)) - (@padd_h * 2%));
+	width: @col-halfgut-width - (0.5 * @gut);
+	*width:	@col-halfgut-width - (0.5 * @gut) - 0.2%;/* for IE */
+	.mod; 
+	padding-top:@padd_v;
+	padding-bottom:@padd_v;
+	padding-left:@padd_h;
+	padding-right:@padd_h;}
+
+/* helpers to add margins in full column widths */ 
+.margin-left(@margin_cols:1){
+	margin-left:@col1_plus_gut * @margin_cols;}
+
+.margin-right(@margin_cols:1){
+	margin-right:@col1_plus_gut * @margin_cols !important;
+	*display:inline;}/*double margin bug fix/*
+
+/* helpers to keep layout in baseline and compenstate used borders */
+.margin-top(@lines:1, @borders_to_compensate:0){
+	margin-top: (@line*@lines) - @borders_to_compensate/@fontpxem;}
+
+.margin-bottom(@lines:1, @borders_to_compensate:0){
+	margin-bottom: (@line*@lines) - @borders_to_compensate/@fontpxem;}
+
+.padding-top(@lines:1, @borders_to_compensate:0){
+	padding-top: (@line*@lines) - @borders_to_compensate/@fontpxem;}
+
+.padding-bottom(@lines:1, @borders_to_compensate:0){
+	padding-bottom: (@line*@lines) - @borders_to_compensate/@fontpxem;}
+
+/* ------------------------------------------------------------------- */
+
+/* last element in row if used inside less */
+.last(@align:left) {
+	margin-right:0 !important;
+	float:@align !important;}
+
+/* if called straight from xhtml */
+.last {
+	margin-right: 0 !important;}
+/* @end */
+
+
+/* @group other */
+/* default clear if content doesn't need to flow outside container */ 
+.clear {
+	overflow:hidden;
+	display: inline-block;
+	zoom:1;
+    display: block;}
+
+/* alternative way to clear if your content needs to flow outside container */
+.clearfix:after {
+	content:"."; 
+	display: block; 
+	height: 0; 
+	clear:both; 
+	visibility: hidden
+	}
+
+/* @end */
+
+
+/* @group Grid */
+/* This grid is only for development purposes, you can overlay it on top of page to check consistency */
+
+#grid_wrapper,
+#grid_no_gut_wrapper {
+	position:absolute;
+	left:0;
+	top:0;
+	z-index:100;
+	min-width:@min-width;
+	width:100%;
+	height:5000px;}
+	
+#grid {
+	height:100%;
+	
+	.grid_col {
+		height:100%;
+		.col(1);
+		background:transparent url(../centage/img/grid_fluid.png) repeat-y 0 0;
+		@line:@linepx * 1px;
+		-o-background-size: 500px @line;
+		-khtml-background-size: 500px @line;
+		-webkit-background-size: 500px @line;			
+		-moz-background-size: 500px @line;			
+		background-size: 500px @line;			
+		position:relative;
+		}
+	
+	.lastcol {
+		.last(right);}			
+		
+	.right_grid_colborder {
+		position:absolute;
+		right:0;
+		height:100%;
+		background:transparent url(../centage/img/grid_fluid.png) repeat-y 0 0;
+		background-position-right:-1px;
+		width:1px;}
+	}
+
+#grid_no_gut {
+	height:100%;
+
+	.center {
+		display: inline-block;
+		height:100%;
+		width:@gut;
+		margin-left:@col1_gut;
+		*margin-left:@col1_gut - 0.1%;
+		float:left;
+		background:transparent url(../centage/img/grid_center.png) repeat-y 50% 50%;
+		position:relative;}
+	}	
+	
+#grid_toggle{
+	position:fixed;
+	*position: absolute;
+	z-index: 1000;
+	top:@line;
+	right: @gut;}
+/* @end */
+
+
+/* set the page dimensions */
+#wrap,
+#grid,
+#grid_no_gut{
+	max-width: @max-width;
+	min-width: @min-width;
+	margin:0 auto; 
+	overflow: hidden; 
+	padding:0 @page-padding;
+	}

@@ -1,0 +1,49 @@
+@import '../centage/init.less';
+
+body {
+  background: #B0B4BD url("../images/background.png");
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+#highlight {
+  width: 1158px;
+  min-height: 897px;
+  background: url("../images/bg_center_highlight.png") no-repeat;
+  margin: 0 auto;
+  margin-bottom: -897px;
+}
+
+#wrap {
+  position: relative;
+  margin: 3em auto;
+}
+
+.container {
+  .clear;
+  margin-bottom: @line;
+  
+  div {
+    background-color: #ccc;
+    height: 3*@line;
+    
+    &:last-child {
+      .last();
+    }
+  } 
+}
+
+.col4 {
+/*  .margin-left(3);*/
+  div {
+    .col(2);
+  }
+}
+
+.hide{display:none;}
+
+/*Royal purple selection :)*/
+/*::-moz-selection{background:#6B3FA0;}
+::selection{background:#6B3FA0;}
+code::-moz-selection{background:#6B3FA0;}
+code::selection{background:#6B3FA0;}
+*/
