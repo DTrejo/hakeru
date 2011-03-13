@@ -18,7 +18,7 @@ var sys = require('sys')
   
 // Firin up our in-built node server
 var httpServer = http.createServer(function (request, response) {
-  session(request, response, function(request, response){
+  session(request, response, function(request, response) {
     // now we can access request.session
 
     request.body = '';
@@ -91,15 +91,15 @@ var httpServer = http.createServer(function (request, response) {
           break;
         
         // for easy testing.
-        case '/demo':
-          if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
-          jqserve(request, response, '/room.html', function(err, $) {
-            if (err) console.log(err);
-            var userid = $('<link/>').attr('id', 'userid')
-                                     .attr('userid', request.session.data.user);
-            $('head').append(userid);
-          });
-          break;
+        // case '/demo':
+        //   if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
+        //   jqserve(request, response, '/room.html', function(err, $) {
+        //     if (err) console.log(err);
+        //     var userid = $('<link/>').attr('id', 'userid')
+        //                              .attr('userid', request.session.data.user);
+        //     $('head').append(userid);
+        //   });
+        //   break;
           
 
         default:

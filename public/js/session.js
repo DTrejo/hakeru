@@ -34,7 +34,7 @@ var messageHandlers = new Object();
 //    message directly following a message by oneself
 messageHandlers['chat'] = function(data) {
   var linkedMsg = $('<span>').html(data.msg).mailto().autolink();
-  $('a', linkedMsg).embedly({maxWidth:600,'method':'after'});
+  // $('a', linkedMsg).embedly({maxWidth:600,'method':'after'});
   // will the above work?
   
   // message directly following a message by oneself

@@ -92,18 +92,20 @@ messageHandlers['delete_task'] = function(client, data){
 
 
 
-function handleNewConnection(client){
-  client.on('message', function(message){      
+function handleNewConnection(client) {
+  client.on('message', function(message) {
   console.log('Message Received');   
     var messageObj = JSON.parse(message);
     if(messageObj != null && "type" in messageObj && messageObj.type in messageHandlers) {
       messageHandlers[messageObj.type](client, messageObj.data);
 
-      console.log('Saving Message');
-      mongo.collection('messages', function(err, collection){
-        messageObj.date = new Date(); // is this any good?
-        collection.insert(messageObj, function(err, docs){});
-      });
+      // is this any good?
+      // NEEDS PIPE NAME!
+      // console.log('Saving Message');
+      // mongo.collection('messages', function(err, collection) {
+      //   messageObj.date = new Date();
+      //   collection.insert(messageObj, function(err, docs){});
+      // });
       
     }
   });
