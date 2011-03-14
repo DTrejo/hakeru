@@ -15,7 +15,7 @@
  
 h2. Protips:
 
-Hakeru's production Node server is eric.no.de:9000  
+Hakeru's production Node server is dtrejo.no.de
 
 In order to push your changes to prod you must
 
@@ -75,3 +75,16 @@ There are empty folders that should not be empty!
 
 I have an error!
 * email david or call him, make sure to have the stack trace on hand
+
+
+h2. installation on no.de
+
+install mongo
+
+run mongo with --dbpath option, so no root needed
+
+symlink to latest node
+
+install specific npm packages needed by the code.
+
+ugh annoying.
