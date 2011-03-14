@@ -134,11 +134,12 @@ var httpServer = http.createServer(function (request, response) {
 
 function handleUpload (req, res) {
   // parse a file upload
-  var form = new formidable.IncomingForm();
-  form.parse(req, function(err, fields, files) {
-    if (err) console.log(err);
-    sendJson({fields: fields, files: files});
-  });
+  // var form = new formidable.IncomingForm();
+  // form.parse(req, function(err, fields, files) {
+  //   if (err) console.log(err);
+  //   sendJson({fields: fields, files: files});
+  // });
+  sendJson(res, {fields: "Not Implemented", files: "Not Implemented"});
 }
 
 function sendJson(response, json) {
