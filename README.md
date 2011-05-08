@@ -1,40 +1,41 @@
 <pre>
-      ___           ___           ___           ___           ___           ___     
-     /__/\         /  /\         /__/|         /  /\         /  /\         /__/\    
-     \  \:\       /  /::\       |  |:|        /  /:/_       /  /::\        \  \:\   
-      \__\:\     /  /:/\:\      |  |:|       /  /:/ /\     /  /:/\:\        \  \:\  
-  ___ /  /::\   /  /:/~/::\   __|  |:|      /  /:/ /:/_   /  /:/~/:/    ___  \  \:\ 
+      ___           ___           ___           ___           ___           ___
+     /__/\         /  /\         /__/|         /  /\         /  /\         /__/\
+     \  \:\       /  /::\       |  |:|        /  /:/_       /  /::\        \  \:\
+      \__\:\     /  /:/\:\      |  |:|       /  /:/ /\     /  /:/\:\        \  \:\
+  ___ /  /::\   /  /:/~/::\   __|  |:|      /  /:/ /:/_   /  /:/~/:/    ___  \  \:\
  /__/\  /:/\:\ /__/:/ /:/\:\ /__/\_|:|____ /__/:/ /:/ /\ /__/:/ /:/___ /__/\  \__\:\
  \  \:\/:/__\/ \  \:\/:/__\/ \  \:\/:::::/ \  \:\/:/ /:/ \  \:\/:::::/ \  \:\ /  /:/
-  \  \::/       \  \::/       \  \::/~~~~   \  \::/ /:/   \  \::/~~~~   \  \:\  /:/ 
-   \  \:\        \  \:\        \  \:\        \  \:\/:/     \  \:\        \  \:\/:/  
-    \  \:\        \  \:\        \  \:\        \  \::/       \  \:\        \  \::/   
+  \  \::/       \  \::/       \  \::/~~~~   \  \::/ /:/   \  \::/~~~~   \  \:\  /:/
+   \  \:\        \  \:\        \  \:\        \  \:\/:/     \  \:\        \  \:\/:/
+    \  \:\        \  \:\        \  \:\        \  \::/       \  \:\        \  \::/
      \__\/         \__\/         \__\/         \__\/         \__\/         \__\/
 </pre>
 
-h2. How to get the dev server running! (does not yet fully duplicate production, but in any case):
+## How to get the dev server running! (does not yet fully duplicate production, but in any case):
 
 Clone this repository using like this*:
 <pre>git clone git@github.com:DTrejo/hakeru.git</pre>
 
 make sure you have "mongodb installed":http://www.mongodb.org/downloads, or just "sudo port install mongodb." Make sure you follow the "quickstart guide":http://www.mongodb.org/display/DOCS/Quickstart for your OS. For mac you'd run:
 <pre>mkdir -p /data/db</pre>
-  
-Also get the node code ("install npm":http://github.com/isaacs/npm, or "install it along with node":http://gist.github.com/579814):
-<pre>cd hakeru/
-npm install
-</pre>
-  
-h2. Now that you have all the dependencies, you should be able to start up the server:
 
-<pre>cd hakeru/
-mongod
-sudo node server.js</pre>
+Also get the node code ([install npm](http://github.com/isaacs/npm), or [install it along with node](http://gist.github.com/579814):
 
-the server should now be running at "http://localhost/":http://localhost/
+    cd hakeru/
+    npm install
+
+## Now that you have all the dependencies, you should be able to start up the server:
+
+    cd hakeru/
+    mongod
+    sudo node server.js
+
+the server should now be running at [http://localhost/](http://localhost/)
 all done! Develop to your heart's content.
-  
-h2. Things that need attention:
+
+## Things that need attention:
+
 * registration
 * upload
 * clean up the existing code, especially in the chatserver. indentation, variable naming, classes in different files.
@@ -46,22 +47,24 @@ h2. Things that need attention:
 * √ chat rooms work
 * √ html5 notifications work
 
-h2. troubleshooting
+## troubleshooting
 
 I'm missing a module!
-* Do a ctrl-f <code>npm</code> and make sure you've installed everything in this guide
+
+* Do a ctrl-f `npm` and make sure you've installed everything in this guide
 
 I have an error!
+
 * email david or call him, make sure to have the stack trace on hand
 
 
-h2. installation on no.de
+## installation on no.de
 
 install mongo
 
 run mongo with --dbpath option, so no root needed
 
-symlink to latest node
+symlink to latest node or use config.json with correct node version
 
 install specific npm packages needed by the code.
 
