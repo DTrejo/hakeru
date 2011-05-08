@@ -12,15 +12,25 @@
      \__\/         \__\/         \__\/         \__\/         \__\/         \__\/
 </pre>
 
+##tldr;
+
+install mongo and run `mongod`, then
+
+    git clone git@github.com:DTrejo/hakeru.git
+    cd hakeru/
+    npm install
+    sudo node server.js
+
+
 ## How to get the dev server running! (does not yet fully duplicate production, but in any case):
 
 Clone this repository using like this*:
-<pre>git clone git@github.com:DTrejo/hakeru.git</pre>
+    git clone git@github.com:DTrejo/hakeru.git
 
 make sure you have "mongodb installed":http://www.mongodb.org/downloads, or just "sudo port install mongodb." Make sure you follow the "quickstart guide":http://www.mongodb.org/display/DOCS/Quickstart for your OS. For mac you'd run:
 <pre>mkdir -p /data/db</pre>
 
-Also get the node code ([install npm](http://github.com/isaacs/npm), or [install it along with node](http://gist.github.com/579814):
+Also get the node code [install npm](http://github.com/isaacs/npm), or [install it along with node](http://gist.github.com/579814):
 
     cd hakeru/
     npm install
