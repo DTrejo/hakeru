@@ -19,6 +19,7 @@
     "mongodb":"0.7.9",
     "socket.io":"0.6.16",
     "sesh": "0.1.0",
-    "formidable":"0.9.11"
+    "formidable":"0.9.11",
+    "jqserve":"0.0.5"
   }
 }
