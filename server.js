@@ -11,11 +11,12 @@ var sys = require('sys')
   , Connection = require('mongodb').Connection
   , Server = require('mongodb').Server
   , BSON = require('mongodb').BSONPure
-  , mongo = new Db('hakeru', new Server("localhost", 27017, {}))
-  
+  , mongo = new Db('hakeru', new Server(process.env.DUOSTACK_DB_MONGODB
+                                       || "localhost", 27017, {}))
+
   , formidable = require('formidable');
 
-  
+
 // Firin up our in-built node server
 var httpServer = http.createServer(function (request, response) {
   session(request, response, function(request, response) {
@@ -23,7 +24,7 @@ var httpServer = http.createServer(function (request, response) {
 
     request.body = '';
     request.addListener('data', function(chunk){ request.body += chunk; });
-    
+
     // now that we have the whole request body, let's do stuff with it.
     request.addListener('end', function () {
       // merge url params and posted params. This could be dangerous in the future.
@@ -71,7 +72,7 @@ var httpServer = http.createServer(function (request, response) {
           request.session.data.user = 'Guest';
           redirect(response, request, '/index.html', 302);
           break;
-        
+
         case '/notify':
         case '/notify.html':
           jqserve(request, response, '/notify.html', function(err, $) {
@@ -81,7 +82,7 @@ var httpServer = http.createServer(function (request, response) {
             $('#msg').text(params.msg);
           });
           break;
-          
+
         case '/upload':
           if (request.method.toLowerCase() == 'post') {
             handleUpload(request, response);
@@ -89,7 +90,7 @@ var httpServer = http.createServer(function (request, response) {
             jqserve(request,response,'404.html');
           }
           break;
-        
+
         // for easy testing.
         // case '/demo':
         //   if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
@@ -100,7 +101,7 @@ var httpServer = http.createServer(function (request, response) {
         //     $('head').append(userid);
         //   });
         //   break;
-          
+
 
         default:
           // need to serve chatrooms here if url is of form /*
@@ -111,7 +112,7 @@ var httpServer = http.createServer(function (request, response) {
             if (request.session.data.user === 'Guest') {
               redirectToRoom(response, request, '/login.html', 302);
               return;
-              
+
             } else { // they are logged in, so give them a room
               jqserve(request, response, '/room.html', function(err, $) {
                 if (err) console.log(err);
@@ -122,7 +123,7 @@ var httpServer = http.createServer(function (request, response) {
               return;
             }
           }
-          
+
           // else, serve static
           jqserve(request, response);
         break;
@@ -149,11 +150,11 @@ function sendJson(response, json) {
   response.end(text); // problem with sending this?
 }
 
-// 
-// THIS SHOULD REALLY USE BCRYPT  
+//
+// THIS SHOULD REALLY USE BCRYPT
 // https://github.com/ncb000gt/node.bcrypt.js
 // Too bad bcrypt doesn't work on Solaris?
-// 
+//
 function encrypt(data) {
   return crypto.createHash('md5').update(data).digest("hex");
 }
