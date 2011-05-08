@@ -3,7 +3,7 @@ var sys = require('sys')
   , http = require('http')
   , crypto = require('crypto')
   , querystring = require('querystring')
-  , jqserve = require('./lib/jqserve/jqserve.js')
+  , jqserve = require('jqserve')
   , session = require('sesh').session
   , PORT = 80 // MAKE SURE THIS IS SAME AS SOCKET.IO
 
@@ -22,8 +22,8 @@ if (process.env['DUOSTACK_DB_MONGODB']) {
             , pass: db_uri.auth.split(':')[1]
             };
 }
-  var mongo = new Db('hakeru', new Server(db_info.host || "localhost"
-                                         , db_info.port || 27017, {}))
+var mongo = new Db('hakeru', new Server(db_info.host || "localhost"
+                                       , db_info.port || 27017, {}))
   , formidable = require('formidable');
 
 
