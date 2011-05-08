@@ -11,9 +11,19 @@ var sys = require('sys')
   , Connection = require('mongodb').Connection
   , Server = require('mongodb').Server
   , BSON = require('mongodb').BSONPure
-  , mongo = new Db('hakeru', new Server(process.env.DUOSTACK_DB_MONGODB
-                                       || "localhost", 27017, {}))
+  , db_info = { host: 'localhost', port: 27017 };
 
+if (process.env['DUOSTACK_DB_MONGODB']) {
+  var db_uri = url.parse(process.env['DUOSTACK_DB_MONGODB']);
+  db_info = { host: db_uri.hostname
+            , port: parseInt(db_uri.port, 10)
+            , name: db_uri.pathname.substr(1)
+            , user: db_uri.auth.split(':')[0]
+            , pass: db_uri.auth.split(':')[1]
+            };
+}
+  var mongo = new Db('hakeru', new Server(db_info.host || "localhost"
+                                         , db_info.port || 27017, {}))
   , formidable = require('formidable');
 
 
