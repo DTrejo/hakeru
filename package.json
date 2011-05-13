@@ -1,9 +1,9 @@
 {
   "name": "hakeru",
   "description": "realtime chat room with integrated tasks",
-  "version": "0.1.0-1",
+  "version": "0.1.0-2",
   "repository": {
-    "url": ""
+    "url": "git@github.com:DTrejo/hakeru.git"
   },
   "author": "Eric Zhang and David Trejo <dtrejo@cs.brown.edu> (http://dtrejo.com/)",
   "directories": {
