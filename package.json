@@ -1,7 +1,7 @@
 {
   "name": "hakeru",
   "description": "realtime chat room with integrated tasks",
-  "version": "0.1.0",
+  "version": "0.1.0-1",
   "repository": {
     "url": ""
   },
@@ -16,10 +16,10 @@
     "jsdom": "0.2.0",
     "request": "0.10.0",
     "jquery": "1.5.1",
-    "mongodb":"0.7.9",
-    "socket.io":"0.6.16",
+    "mongodb": "0.7.9",
+    "socket.io": "0.6.16",
     "sesh": "0.1.0",
-    "formidable":"0.9.11",
-    "jqserve":"0.0.5"
+    "formidable": "0.9.11",
+    "jqserve": "0.0.5"
   }
 }

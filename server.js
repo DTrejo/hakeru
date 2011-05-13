@@ -57,15 +57,20 @@ function redirectToRoom(res, req, location, status) {
   redirect(res, req, location + '?' + req.url, status);
 }
 
+// 
 // Start server connection.
+//
+console.log('initializing: opening mongo connection...');
 mongo.open(handleMongoOpen);
 function handleMongoOpen(err, c) {
+  console.log('initializing: mongo opened. authing...');
   mongo.authenticate('dtrejo', 'hakerurocks',  handleMongoAuthenticate);
 }
 
 function handleMongoAuthenticate(err, connected) {
   if (err) console.log(err);
   if (!connected) console.log('mongoDBauthenticated = ', connected);
+  console.log('initializing: mongo authd. starting server...');
   startServer();
 }
 
