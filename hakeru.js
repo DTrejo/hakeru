@@ -1,34 +1,25 @@
-var http = require('http'); 
+var http = require('http');
 var io = require('socket.io');
-var sys = require('sys');    
-
-var Db = require('mongodb').Db;
-var Connection = require('mongodb').Connection;
-var Server = require('mongodb').Server;
-var BSON = require('mongodb').BSONPure;
-
-var mongo = new Db('hakeru', new Server('localhost', 27017, {}));
-
-
-
+var sys = require('sys');
 
 var conferencePipes = new Object();
-
 var clientPipeDictionary = new Object();
-    
+
+var mongo; // populated by exports.listen()
+
 //Sanitizing user input
 function encodeHTML(s) {
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;').replace(/>/g, '&gt;');
 }
 // boo
-    
+
 // Handles different modules
 var messageHandlers = new Object();
 
 // Handle chat
 messageHandlers['sessionCheckIn'] = function(client, data){
   clientPipeDictionary[client.sessionId] = data.pipe;
-  
+
   client.userId = data.user_id;
 
     if(!(data.pipe in conferencePipes)) {
@@ -60,7 +51,7 @@ messageHandlers['new_task'] = function(client, data){
   } else {
       var msg = data.msg.slice(1);
   }
-    
+
   var theTask = clientPipe.newTask(encodeHTML(msg), data.group);
   clientPipe.send('new_task', {msg: encodeHTML(data.msg.slice(1)), the_task: theTask, user_id: client.userId, client_name: client.name});
 }
@@ -94,7 +85,7 @@ messageHandlers['delete_task'] = function(client, data){
 
 function handleNewConnection(client) {
   client.on('message', function(message) {
-  console.log('Message Received');   
+  console.log('Message Received');
     var messageObj = JSON.parse(message);
     if(messageObj != null && "type" in messageObj && messageObj.type in messageHandlers) {
       messageHandlers[messageObj.type](client, messageObj.data);
@@ -106,18 +97,18 @@ function handleNewConnection(client) {
       //   messageObj.date = new Date();
       //   collection.insert(messageObj, function(err, docs){});
       // });
-      
+
     }
   });
-  
+
   client.on('disconnect', function(){
-    handleDisconnection(client);  
+    handleDisconnection(client);
   });
 }
 
 function handleDisconnection(client) {
   var pipe = conferencePipes[clientPipeDictionary[client.sessionId]];
-  
+
   if(pipe != null && "removeClient" in pipe) {
     pipe.removeClient(client);
     if(!pipe.hasClient(client.userId)){
@@ -129,7 +120,7 @@ function handleDisconnection(client) {
     }
     delete clientPipeDictionary[client.sessionId];
   }
-  
+
 }
 
 function handleHttp(req, res){
@@ -138,13 +129,13 @@ console.log("HTTP GOT");
   if(requestInfo.pathname == "/upload" && 'query' in requestInfo && 'sessionId' in requestInfo.query && 'userId' in requestInfo.query && 'url' in requestInfo.query && 'size' in requestInfo.query){
     console.log("RECEIVING UPLOAD");
     var clientPipe = conferencePipes[clientPipeDictionary[requestInfo.query.sessionId]];
-    
+
     var fileObj = {file_url: requestInfo.query.url, user_id: requestInfo.query.userId, size: requestInfo.query.size, pipe:clientPipeDictionary[requestInfo.query.sessionId]};
-    
+
     clientPipe.send('file_upload', {file_url: requestInfo.query.url, user_id: requestInfo.query.userId, size: requestInfo.query.size});
     clientPipe.newFile(fileObj);
     clientPipe.files.push(fileObj);
-    
+
     res.writeHead(200, {'Content-Type': 'text/plain'});
     res.end('Hello World\n');
   }
@@ -153,10 +144,10 @@ console.log("HTTP GOT");
 
 
 
-this.listen = function(server) {
-  // Start socket.io
-  mongo.open(function(p_client){});
+this.listen = function(server, mongoConnection) {
+  mongo = mongoConnection;
 
+  // Start socket.io
   var sio = io.listen(server);
 
   sio.on('connection', function(client){
@@ -173,18 +164,18 @@ function Pipe (name) {
   var tasks = new Object();
   var messages = [];
   var files = [];
-  
+
   var nextTaskId = 0;
 
-  
-  
+
+
   this.name = name;
   this.nextTaskId= nextTaskId;
   this.clients = clients;
   this.tasks = tasks;
   this.messages = messages;
   this.files = files;
-  
+
   this.construct = function(client){
     // Necessary for the anonymous functions below
     var self = this;
@@ -199,16 +190,16 @@ function Pipe (name) {
             maxIdSoFar = Math.max(maxIdSoFar, task.id);
           }
           nextTaskId = maxIdSoFar + 1;
-                  
+
           mongo.collection('files', function(err,collection){
             collection.find({'pipe':name}, function(err, cursor){
               cursor.toArray(function(err,docs){
-                
+
                 for(var fileIndex in docs){
                   files.push(docs[fileIndex]);
                 }
                 self.send('zip' , {session_id: client.sessionId, zipped: self.zip()});
-                
+
               });
             });
           });
@@ -216,7 +207,7 @@ function Pipe (name) {
       });
     });
   }
-  
+
   this.addClient = function(client){
     clients[client.sessionId] = client;
   }
@@ -230,16 +221,16 @@ function Pipe (name) {
       }
     }
   }
-  
+
   this.sendToOthers = function(type, data, excluded_id){
     for(var client in clients) {
       if (clients[client] != null && "sessionId" in clients[client] && client != excluded_id) {
         clients[client].send(JSON.stringify({type: type, data: data}));
       }
     }
-  
+
   }
-  
+
   this.newFile = function(fileObj){
     console.log("Inserting le file" + JSON.stringify(fileObj));
     mongo.collection('files', function(err, collection){
@@ -248,11 +239,11 @@ function Pipe (name) {
   }
 
   this.newTask = function(text, group){
-    
+
     var theTask = new Task(text, nextTaskId, 0, name, group);
     tasks[nextTaskId] = theTask;
     console.log(theTask);
- 
+
     mongo.collection('tasks', function(err, collection){
       collection.insert(theTask, function(err, docs){});
     });
@@ -260,7 +251,7 @@ function Pipe (name) {
     nextTaskId++;
     return theTask;
   }
-  
+
   this.acceptTask = function(taskId, userId){
     var theTask = tasks[taskId];
     theTask.owner = userId;
@@ -270,7 +261,7 @@ function Pipe (name) {
     });
     return tasks[taskId];
   }
-  
+
   this.completeTask = function(taskId, userId){
     var theTask = tasks[taskId];
     theTask.completed = true;
@@ -279,7 +270,7 @@ function Pipe (name) {
     });
     return tasks[taskId];
   }
-  
+
   this.giveUpTask = function(taskId, userId){
     var theTask = tasks[taskId];
     theTask.owner = 0;
@@ -288,18 +279,18 @@ function Pipe (name) {
     });
     return theTask;
   }
-  
+
   this.deleteTask = function(taskId, userId){
     var theTask = tasks[taskId];
     mongo.collection('tasks', function(err,collection){
       collection.remove({id: Number(taskId), pipe: name}, function(err,docs){
-        
+
       });
     });
     delete tasks[taskId];
     return theTask;
   }
-  
+
   this.members = function(){
     var i = 0;
     for(var client in clients) {
@@ -309,7 +300,7 @@ function Pipe (name) {
     }
     return i;
   }
-  
+
   this.hasClient = function(userId){
     for(var clientIndex in clients){
       if((clients[clientIndex]).userId == userId){
@@ -320,10 +311,10 @@ function Pipe (name) {
   }
 
   this.zip = function(){
-    
+
     var theZip = new Object();
     var users_tasks = new Object();
-    
+
     for(var taskId in tasks) {
       if(!(tasks[taskId].owner in users_tasks)) {
         users_tasks[tasks[taskId].owner] = new Object();
@@ -338,26 +329,26 @@ function Pipe (name) {
         users_tasks[client.userId] = new Object();
       }
       users_tasks[client.userId].here = true;
-      
+
     }
-    
+
     theZip["users"] = users_tasks;
     theZip["messages"] = messages;
     theZip['files'] = files;
-    
+
     console.log("Zipping contents");
-    
+
     return theZip;
-  
+
   }
-  
+
   this.bufferMessage= function(messageObj){
     messages.push(messageObj);
     if(messages.length > 100){
       messages.splice(0, messages.length - 100);
     }
   }
-  
+
 }
 
 function Task(text, id, owner, pipe, group){

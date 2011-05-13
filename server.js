@@ -10,138 +10,9 @@ var sys = require('sys')
   , Db = require('mongodb').Db
   , Connection = require('mongodb').Connection
   , Server = require('mongodb').Server
-  , BSON = require('mongodb').BSONPure
-  , db_info = { host: 'localhost', port: 27017 };
 
-if (process.env['DUOSTACK_DB_MONGODB']) {
-  var db_uri = url.parse(process.env['DUOSTACK_DB_MONGODB']);
-  db_info = { host: db_uri.hostname
-            , port: parseInt(db_uri.port, 10)
-            , name: db_uri.pathname.substr(1)
-            , user: db_uri.auth.split(':')[0]
-            , pass: db_uri.auth.split(':')[1]
-            };
-}
-var mongo = new Db('hakeru', new Server(db_info.host || "localhost"
-                                       , db_info.port || 27017, {}))
+  , mongo = new Db('hakeru', new Server('flame.mongohq.com', 27101, {}))
   , formidable = require('formidable');
-
-
-// Firin up our in-built node server
-var httpServer = http.createServer(function (request, response) {
-  session(request, response, function(request, response) {
-    // now we can access request.session
-
-    request.body = '';
-    request.addListener('data', function(chunk){ request.body += chunk; });
-
-    // now that we have the whole request body, let's do stuff with it.
-    request.addListener('end', function () {
-      // merge url params and posted params. This could be dangerous in the future.
-      var parsed = url.parse(request.url)
-        , params = querystring.parse(parsed.query)
-        , posted = querystring.parse(request.body);
-      for (i in posted) { params[i] = posted[i]; }
-
-      switch(parsed.pathname) {
-        case '/':
-        case '/index.html':
-          jqserve(request, response, 'index.html');
-          break;
-
-        // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
-        case '/login.json':
-          console.log("loggin in");
-          mongo.collection('users', function(err, collection){
-            collection.findOne({'username': params.userid, 'password': encrypt(params.password)}, function(err, doc) {
-              if (doc != undefined) {
-                request.session.data.user = params.userid;
-                sendJson(response, { msg: 'success' });
-              } else {
-                sendJson(response, { msg: 'Bad combination - Try again?' });
-              }
-            });
-            params.userid; // check this against db
-            params.password; // check this against md5 version in DB.
-            params.pipeName; // useful in future for making sure has access to pipe
-          });
-          break;
-        case '/register.json':
-            mongo.collection('users', function(err, collection){
-              collection.findOne({'username': params.userid}, function(err, doc) {
-                if (doc != undefined) {
-                  sendJson(response, { msg: 'Username is taken, try another' });
-                } else {
-                  collection.insert({username: params.userid, password: encrypt(params.password)},function(err, docs){});
-                  sendJson(response, { msg: 'Registered!' });
-                }
-              });
-            });
-          break;
-        case '/logout':
-          request.session.data.user = 'Guest';
-          redirect(response, request, '/index.html', 302);
-          break;
-
-        case '/notify':
-        case '/notify.html':
-          jqserve(request, response, '/notify.html', function(err, $) {
-            var link = $('#link');
-            link.attr('href', 'http://'+request.headers.host+ '/' + params.pipe + '/#' + params.hash);
-            $('#title').text(params.title);
-            $('#msg').text(params.msg);
-          });
-          break;
-
-        case '/upload':
-          if (request.method.toLowerCase() == 'post') {
-            handleUpload(request, response);
-          } else {
-            jqserve(request,response,'404.html');
-          }
-          break;
-
-        // for easy testing.
-        // case '/demo':
-        //   if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
-        //   jqserve(request, response, '/room.html', function(err, $) {
-        //     if (err) console.log(err);
-        //     var userid = $('<link/>').attr('id', 'userid')
-        //                              .attr('userid', request.session.data.user);
-        //     $('head').append(userid);
-        //   });
-        //   break;
-
-
-        default:
-          // need to serve chatrooms here if url is of form /*
-          var hashstripped = parsed.pathname.substring(0, parsed.pathname.lastIndexOf('/#'));
-          if (/^(\/)((?:[a-z][a-z0-9_]*))$/i.test(parsed.pathname)) {
-            // console.log('user:',request.session.data.user);
-            // console.log('history:',request.session.data.history);
-            if (request.session.data.user === 'Guest') {
-              redirectToRoom(response, request, '/login.html', 302);
-              return;
-
-            } else { // they are logged in, so give them a room
-              jqserve(request, response, '/room.html', function(err, $) {
-                if (err) console.log(err);
-                var userid = $('<link/>').attr('id', 'userid')
-                                         .attr('userid', request.session.data.user);
-                $('head').append(userid);
-              });
-              return;
-            }
-          }
-
-          // else, serve static
-          jqserve(request, response);
-        break;
-      }
-    });
-
-  });
-});
 
 function handleUpload (req, res) {
   // parse a file upload
@@ -186,10 +57,137 @@ function redirectToRoom(res, req, location, status) {
   redirect(res, req, location + '?' + req.url, status);
 }
 
-httpServer.listen(PORT);
+// Start server connection.
+mongo.open(handleMongoOpen);
+function handleMongoOpen(err, c) {
+  mongo.authenticate('dtrejo', 'hakerurocks',  handleMongoAuthenticate);
+}
 
-// Start server connection
-mongo.open(function(p_client){});
-var chatServer = require('./hakeru.js');
-chatServer.listen(httpServer);
-console.log('> server is listening on http://127.0.0.1:' + PORT + '/');
+function handleMongoAuthenticate(err, connected) {
+  if (err) console.log(err);
+  if (!connected) console.log('mongoDBauthenticated = ', connected);
+  startServer();
+}
+
+// Firin up our in-built node server
+function startServer() {
+  var httpServer = http.createServer(function (request, response) {
+    session(request, response, function(request, response) {
+      // now we can access request.session
+
+      request.body = '';
+      request.addListener('data', function(chunk){ request.body += chunk; });
+
+      // now that we have the whole request body, let's do stuff with it.
+      request.addListener('end', function () {
+        // merge url params and posted params. This could be dangerous in the future.
+        var parsed = url.parse(request.url)
+          , params = querystring.parse(parsed.query)
+          , posted = querystring.parse(request.body);
+        for (i in posted) { params[i] = posted[i]; }
+
+        switch(parsed.pathname) {
+          case '/':
+          case '/index.html':
+            jqserve(request, response, 'index.html');
+            break;
+
+          // these routes are get/post/delete agnostic, but that's ok since we're doing simple stuff.
+          case '/login.json':
+            console.log("loggin in");
+            mongo.collection('users', function(err, collection){
+              collection.findOne({'username': params.userid, 'password': encrypt(params.password)}, function(err, doc) {
+                if (doc != undefined) {
+                  request.session.data.user = params.userid;
+                  sendJson(response, { msg: 'success' });
+                } else {
+                  sendJson(response, { msg: 'Bad combination - Try again?' });
+                }
+              });
+              params.userid; // check this against db
+              params.password; // check this against md5 version in DB.
+              params.pipeName; // useful in future for making sure has access to pipe
+            });
+            break;
+          case '/register.json':
+              mongo.collection('users', function(err, collection){
+                collection.findOne({'username': params.userid}, function(err, doc) {
+                  if (doc != undefined) {
+                    sendJson(response, { msg: 'Username is taken, try another' });
+                  } else {
+                    collection.insert({username: params.userid, password: encrypt(params.password)},function(err, docs){});
+                    sendJson(response, { msg: 'Registered!' });
+                  }
+                });
+              });
+            break;
+          case '/logout':
+            request.session.data.user = 'Guest';
+            redirect(response, request, '/index.html', 302);
+            break;
+
+          case '/notify':
+          case '/notify.html':
+            jqserve(request, response, '/notify.html', function(err, $) {
+              var link = $('#link');
+              link.attr('href', 'http://'+request.headers.host+ '/' + params.pipe + '/#' + params.hash);
+              $('#title').text(params.title);
+              $('#msg').text(params.msg);
+            });
+            break;
+
+          case '/upload':
+            if (request.method.toLowerCase() == 'post') {
+              handleUpload(request, response);
+            } else {
+              jqserve(request,response,'404.html');
+            }
+            break;
+
+          // for easy testing.
+          // case '/demo':
+          //   if (request.session.data.user == 'Guest') request.session.data.user = 'Guest-' + parseInt(Math.random() * 10000);
+          //   jqserve(request, response, '/room.html', function(err, $) {
+          //     if (err) console.log(err);
+          //     var userid = $('<link/>').attr('id', 'userid')
+          //                              .attr('userid', request.session.data.user);
+          //     $('head').append(userid);
+          //   });
+          //   break;
+
+          default:
+            // need to serve chatrooms here if url is of form /*
+            var hashstripped = parsed.pathname.substring(0, parsed.pathname.lastIndexOf('/#'));
+            if (/^(\/)((?:[a-z][a-z0-9_]*))$/i.test(parsed.pathname)) {
+              // console.log('user:',request.session.data.user);
+              // console.log('history:',request.session.data.history);
+              if (request.session.data.user === 'Guest') {
+                redirectToRoom(response, request, '/login.html', 302);
+                return;
+
+              } else { // they are logged in, so give them a room
+                jqserve(request, response, '/room.html', function(err, $) {
+                  if (err) console.log(err);
+                  var userid = $('<link/>').attr('id', 'userid')
+                                           .attr('userid', request.session.data.user);
+                  $('head').append(userid);
+                });
+                return;
+              }
+            }
+
+            // else, serve static
+            jqserve(request, response);
+          break;
+        }
+      });
+
+    });
+  });
+
+  httpServer.listen(PORT);
+
+  var chatServer = require('./hakeru.js');
+  chatServer.listen(httpServer, mongo);
+  console.log('> server is listening on http://127.0.0.1:' + PORT + '/');
+};
